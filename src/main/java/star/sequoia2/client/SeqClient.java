@@ -120,7 +120,6 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
     private void registerFeatures() {
         features.add(new Client()); // always first so you can get colors
-        features.add(new MessageAnalyzerFeature());
         features.add(new RenderTest());
     }
 
