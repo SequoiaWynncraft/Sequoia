@@ -1,0 +1,146 @@
+plugins {
+    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'maven-publish'
+    id 'io.freefair.lombok' version '8.11'
+}
+import groovy.json.JsonOutput
+import java.nio.charset.StandardCharsets
+
+def gitOut = { List<String> args ->
+    def baos = new ByteArrayOutputStream()
+    exec {
+        workingDir rootDir
+        commandLine(['git'] + args)
+        standardOutput = baos
+    }
+    return baos.toString(StandardCharsets.UTF_8.name()).trim()
+}
+
+def commitHash = gitOut(['rev-parse', '--short', 'HEAD'])
+def commitMessages = gitOut(['log', '-20', '--pretty=%s']).readLines()
+def commitAuthors = gitOut(['log', '-20', '--pretty=%an']).readLines()
+def commitDate = gitOut(['log', '-1', '--date=format:%d-%m-%Y', '--pretty=%cd']).readLines()
+
+def joinedMessages = commitMessages.join("\n")
+def joinedAuthors = commitAuthors.join("\n")
+def joinedDate = commitDate.join("\n")
+
+project.ext.mod_version = "${commitHash}"
+project.ext.commit_list = "${joinedMessages}"
+project.ext.commit_authors = "${joinedAuthors}"
+project.ext.commit_date = "${joinedDate}"
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+loom {
+    runs {
+        client {
+            property("devauth.configDir", getRootProject().file(".devauth").absolutePath)
+            vmArgs "-ea"
+            client()
+        }
+    }
+}
+
+fabricApi {
+    configureDataGeneration {
+        client = true
+    }
+}
+
+repositories {
+    maven {
+        url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
+    }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
+}
+
+dependencies {
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    modImplementation("com.github.collarmc:pounce:${project.pounce_version}")
+    include("com.github.collarmc:pounce:${project.pounce_version}")
+
+    modImplementation group: 'mil.nga', name: 'color', version: '1.0.0'
+    include group: 'mil.nga', name: 'color', version: '1.0.0'
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    //devauth
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    inputs.property "commit_list", project.commit_list
+    inputs.property "commit_authors", project.commit_authors
+    inputs.property "commit_date", project.commit_date
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version,
+                "commit_list": JsonOutput.toJson(joinedMessages).replaceAll(/^"|"$/, ""),
+                "commit_authors": JsonOutput.toJson(joinedAuthors).replaceAll(/^"|"$/, ""),
+                "commit_date": JsonOutput.toJson(commit_date).replaceAll(/^"|"$/, "")
+    }
+}
+
+def targetJavaVersion = 21
+tasks.withType(JavaCompile).configureEach {
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    // If Javadoc is generated, this must be specified in that task too.
+    it.options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release.set(targetJavaVersion)
+    }
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/nectar.accesswidener")
+}
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}

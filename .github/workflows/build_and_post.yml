@@ -1,0 +1,42 @@
+name: Build and Post JAR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Rename JAR to Nectar.jar
+        run: |
+          JAR_FILE=$(find build/libs -name "*.jar")
+          echo "Renaming $JAR_FILE to Nectar.jar"
+          mv $JAR_FILE build/libs/Nectar.jar
+
+#      - name: Upload JAR
+#        run: |
+#          echo "Uploading Nectar.jar"
+#          curl -X POST -H "Content-Type: multipart/form-data" \
+#          -F "file=@build/libs/Nectar.jar" \
+#          ${{ secrets.DISCORD_WEBHOOK_URL }}
