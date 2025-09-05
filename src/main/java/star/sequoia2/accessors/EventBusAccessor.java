@@ -2,11 +2,11 @@ package star.sequoia2.accessors;
 
 import com.collarmc.pounce.CancelableCallback;
 import com.collarmc.pounce.EventBus;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 
 public interface EventBusAccessor {
     default EventBus events() {
-        return NectarClient.getEventBus();
+        return SeqClient.getEventBus();
     }
 
     default void dispatch(Object o) {

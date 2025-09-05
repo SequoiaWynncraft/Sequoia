@@ -16,7 +16,7 @@ import org.joml.Matrix4f;
 
 import java.awt.*;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class RenderTest extends ToggleFeature implements RenderUtilAccessor {
 

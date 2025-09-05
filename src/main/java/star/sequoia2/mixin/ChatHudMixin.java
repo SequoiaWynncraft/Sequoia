@@ -35,10 +35,10 @@ public abstract class ChatHudMixin implements IChatHud, EventBusAccessor {
 
     @Override
     @Invoker("addMessage")
-    public abstract void nectar$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
+    public abstract void seq$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
 
     @Override
-    public void nectar$remove(@Nullable MessageSignatureData signature) {
+    public void seq$remove(@Nullable MessageSignatureData signature) {
         if (signature == null)
             return;
 

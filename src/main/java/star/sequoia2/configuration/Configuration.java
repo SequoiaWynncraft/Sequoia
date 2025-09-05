@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 @Getter
 public final class Configuration {
@@ -42,7 +42,7 @@ public final class Configuration {
     }
 
     private File configFile() {
-        return new File(mc.runDirectory, "nectar.json");
+        return new File(mc.runDirectory, "seq.json");
     }
 
     public File configsFolder() throws IOException {
@@ -62,15 +62,15 @@ public final class Configuration {
         Path configDirPath;
         if (userHome != null) {
             if (osName.contains("win")) {
-                configDirPath = Paths.get(userHome, "nectar");
+                configDirPath = Paths.get(userHome, "seq");
             } else if (osName.contains("mac")) {
-                configDirPath = Paths.get(userHome, "Library", "Application Support", "nectar");
+                configDirPath = Paths.get(userHome, "Library", "Application Support", "seq");
             } else {
                 String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
                 if (xdgConfigHome != null && !xdgConfigHome.isEmpty()) {
-                    configDirPath = Paths.get(xdgConfigHome, "nectar");
+                    configDirPath = Paths.get(xdgConfigHome, "seq");
                 } else {
-                    configDirPath = Paths.get(userHome, ".config", "nectar");
+                    configDirPath = Paths.get(userHome, ".config", "seq");
                 }
             }
 
@@ -79,7 +79,7 @@ public final class Configuration {
             }
 
             return configDirPath.toFile();
-        } else return new File(mc.runDirectory, "nectar"); //legacy way if chink method doesn't work (tbf default.json should be per instance cuz multiple instances use same config with the current system, or just make configs loadable/saveable)
+        } else return new File(mc.runDirectory, "seq"); //legacy way if chink method doesn't work (tbf default.json should be per instance cuz multiple instances use same config with the current system, or just make configs loadable/saveable)
     }
 
 }

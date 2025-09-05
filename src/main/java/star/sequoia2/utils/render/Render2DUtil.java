@@ -22,7 +22,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class Render2DUtil implements TextRendererAccessor {
 

@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 
-public class NectarClient implements ClientModInitializer, EventBusAccessor {
+public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static boolean initialized = false;
@@ -71,7 +71,7 @@ public class NectarClient implements ClientModInitializer, EventBusAccessor {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("Initializing Nectar client.");
+        LOGGER.info("Initializing Seq client.");
         eventBus = new EventBus(mc::execute); //before initializing everything else
         eventBus.subscribe(this);
 

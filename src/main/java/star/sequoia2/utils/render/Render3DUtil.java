@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class Render3DUtil {
     public void drawBoxFilled(MatrixStack stack, Box box, Color color) {

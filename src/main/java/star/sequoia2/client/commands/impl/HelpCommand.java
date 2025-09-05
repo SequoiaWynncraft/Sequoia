@@ -3,7 +3,7 @@ package star.sequoia2.client.commands.impl;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.accessors.NotificationsAccessor;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.commands.Command;
 import star.sequoia2.features.impl.Client;
 import net.minecraft.command.CommandSource;
@@ -27,7 +27,7 @@ public class HelpCommand extends Command implements NotificationsAccessor, Featu
             .executes(context -> {
                 StringBuilder commandDetails = new StringBuilder();
                 commandDetails.append("List of commands:").append("\n");
-                for (Command command : NectarClient.getCommands().getCommandsList()) {
+                for (Command command : SeqClient.getCommands().getCommandsList()) {
                     commandDetails.append(Formatting.WHITE).append(feature(Client.class).getPrefix()).append(command.getName());
 
                     if (!command.getArguments().isEmpty()) {

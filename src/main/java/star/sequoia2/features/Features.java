@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 
 public class Features implements EventBusAccessor {

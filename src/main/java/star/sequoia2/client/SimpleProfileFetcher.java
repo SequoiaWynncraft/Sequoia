@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class SimpleProfileFetcher {
     private static final ConcurrentHashMap<UUID,   CompletableFuture<Optional<GameProfile>>> BY_ID   = new ConcurrentHashMap<>();

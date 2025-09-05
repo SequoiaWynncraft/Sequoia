@@ -1,20 +1,19 @@
 package star.sequoia2.features.impl;
 
 import com.collarmc.pounce.Subscribe;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.events.input.KeyEvent;
 import star.sequoia2.gui.Fonts;
 import star.sequoia2.gui.screen.ClickGUIScreen;
 import star.sequoia2.features.Feature;
 import star.sequoia2.settings.Binding;
-import op.legends.nectar.settings.types.*;
 import star.sequoia2.settings.types.*;
 import star.sequoia2.utils.Themes;
 import lombok.Getter;
 import mil.nga.color.Color;
 import org.lwjgl.glfw.GLFW;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 
 public class Client extends Feature {
@@ -37,7 +36,7 @@ public class Client extends Feature {
 
     public EnumSetting<Themes.Theme> themeControlEnumSetting = settings().options("Theme", "Theme Setting", Themes.Theme.NOTHING, Themes.Theme.class);
 
-    public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Arial", () -> NectarClient.getFonts().fonts());
+    public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Arial", () -> SeqClient.getFonts().fonts());
 
     IntSetting volume = settings().number("Volume", "Volume of UI sounds.", 100, 0, 100);
 

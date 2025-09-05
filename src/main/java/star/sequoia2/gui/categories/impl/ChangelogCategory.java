@@ -29,21 +29,21 @@ public class ChangelogCategory extends RelativeComponent implements RenderUtilAc
 
         GuiRoot root = getGuiRoot();
 
-        String commitsStr = FabricLoader.getInstance().getModContainer("nectar")
+        String commitsStr = FabricLoader.getInstance().getModContainer("seq")
                 .map(c -> c.getMetadata().getCustomValue("commit_list").getAsString())
                 .orElse("");
         List<String> commits = commitsStr.isEmpty() ? List.of() : List.of(commitsStr.split("\\R"));
 
-        String authorStr = FabricLoader.getInstance().getModContainer("nectar")
+        String authorStr = FabricLoader.getInstance().getModContainer("seq")
                 .map(c -> c.getMetadata().getCustomValue("commit_authors").getAsString())
                 .orElse("");
         List<String> authors = authorStr.isEmpty() ? List.of() : List.of(authorStr.split("\\R"));
 
-        String commitHash = FabricLoader.getInstance().getModContainer("nectar")
+        String commitHash = FabricLoader.getInstance().getModContainer("seq")
                 .map(c -> c.getMetadata().getVersion().toString())
                 .orElse("");
 
-        String commitDate = FabricLoader.getInstance().getModContainer("nectar")
+        String commitDate = FabricLoader.getInstance().getModContainer("seq")
                 .map(c -> c.getMetadata().getCustomValue("commit_date").getAsString())
                 .orElse("");
 
@@ -54,7 +54,7 @@ public class ChangelogCategory extends RelativeComponent implements RenderUtilAc
         float x = left + root.pad;
         float y = top + root.pad + 5;
 
-        renderText(context, "§9Nectar §f+ " + commitHash, x, y, Color.white().getColor(), true);
+        renderText(context, "§9seq §f+ " + commitHash, x, y, Color.white().getColor(), true);
         y = y + textRenderer().fontHeight;
         renderText(context, "§8" + date.getFirst(), x, y, Color.white().getColor(), true);
 

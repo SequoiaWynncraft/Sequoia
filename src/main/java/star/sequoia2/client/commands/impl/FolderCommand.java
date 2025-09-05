@@ -2,7 +2,7 @@ package star.sequoia2.client.commands.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.logging.LogUtils;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.commands.Command;
 import net.minecraft.command.CommandSource;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class FolderCommand extends Command {
     protected void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
             try {
-                File configFolder = NectarClient.getConfiguration().configDirectory();
+                File configFolder = SeqClient.getConfiguration().configDirectory();
 
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(configFolder);

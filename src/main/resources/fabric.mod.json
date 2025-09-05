@@ -1,34 +1,34 @@
 {
   "schemaVersion": 1,
-  "id": "nectar",
+  "id": "seq",
   "version": "${version}",
   "custom": {
     "commit_list": "${commit_list}",
     "commit_authors": "${commit_authors}",
     "commit_date": "${commit_date}"
   },
-  "name": "nectar",
+  "name": "seq",
   "description": "",
   "authors": [],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/nectar/icon.png",
+  "icon": "assets/seq/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "star.sequoia2.client.NectarClient"
+      "star.sequoia2.client.SeqClient"
     ],
     "main": [
-      "star.sequoia2.Nectar"
+      "star.sequoia2.Seq"
     ]
   },
   "mixins": [
-    "nectar.mixins.json"
+    "seq.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
   },
-  "accessWidener": "nectar.accesswidener"
+  "accessWidener": "seq.accesswidener"
 }

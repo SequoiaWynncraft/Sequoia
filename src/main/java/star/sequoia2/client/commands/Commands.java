@@ -2,10 +2,9 @@ package star.sequoia2.client.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
-import op.legends.nectar.client.commands.impl.*;
 import star.sequoia2.client.commands.impl.*;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 public class Commands {
     private static final ArrayList<Command> COMMANDS = new ArrayList<>();
 
-    public static final CommandSource COMMAND_SOURCE = new ClientCommandSource(null, NectarClient.mc);
+    public static final CommandSource COMMAND_SOURCE = new ClientCommandSource(null, SeqClient.mc);
     public static final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
 
     public Commands() {

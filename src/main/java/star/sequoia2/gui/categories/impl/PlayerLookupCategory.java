@@ -9,7 +9,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minidev.json.JSONObject;
 import star.sequoia2.accessors.RenderUtilAccessor;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.component.SearchBarComponent;
 import star.sequoia2.http.Http;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class PlayerLookupCategory extends RelativeComponent implements RenderUtilAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -232,7 +232,7 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
 
         if (mc.world == null) return;
 
-        NectarClient.getProfileFetcher().fetchByUUID(UUID.fromString(uuidStr))
+        SeqClient.getProfileFetcher().fetchByUUID(UUID.fromString(uuidStr))
             .thenAccept(gameProfile -> {
                 previewPlayer = gameProfile.map(profile -> new OtherClientPlayerEntity(mc.world, profile)).orElse(null);
             });

@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import star.sequoia2.accessors.ConfigurationAccessor;
 import star.sequoia2.accessors.NotificationsAccessor;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.commands.Command;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class ConfigCommand extends Command implements NotificationsAccessor, ConfigurationAccessor {
     public ConfigCommand() {
@@ -98,7 +98,7 @@ public class ConfigCommand extends Command implements NotificationsAccessor, Con
         }
         try {
             File configsFolder = configuration().configsFolder();
-            File currentConfig = new File(mc.runDirectory, "nectar.json");
+            File currentConfig = new File(mc.runDirectory, "seq.json");
             if (!currentConfig.exists()) {
                 notifications().sendMessage(Text.of("Current config file does not exist."));
                 return SINGLE_SUCCESS;
@@ -124,13 +124,13 @@ public class ConfigCommand extends Command implements NotificationsAccessor, Con
                 notifications().sendMessage(Text.of("Config " + name + " does not exist."));
                 return SINGLE_SUCCESS;
             }
-            File currentConfig = new File(mc.runDirectory, "nectar.json");
+            File currentConfig = new File(mc.runDirectory, "seq.json");
             byte[] data = Files.readAllBytes(source.toPath());
             Files.write(currentConfig.toPath(), data);
 
-            NectarClient.reloadConfiguration();
+            SeqClient.reloadConfiguration();
 
-            NectarClient.getSettings().load(NectarClient.getFeatures());
+            SeqClient.getSettings().load(SeqClient.getFeatures());
 
             notifications().sendMessage(Text.of("Config " + name + " loaded successfully."));
         } catch (IOException e) {

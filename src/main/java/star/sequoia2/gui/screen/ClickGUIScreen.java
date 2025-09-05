@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class ClickGUIScreen extends Screen implements FeaturesAccessor, RenderUtilAccessor {
 
@@ -30,7 +30,7 @@ public class ClickGUIScreen extends Screen implements FeaturesAccessor, RenderUt
     public final GuiRoot root;
 
     public ClickGUIScreen() {
-        super(Text.literal("Nectar"));
+        super(Text.literal("Seq"));
         root = new GuiRoot(Categories.all().toList());
     }
 

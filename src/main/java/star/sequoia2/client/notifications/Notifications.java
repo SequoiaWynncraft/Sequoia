@@ -1,7 +1,7 @@
 package star.sequoia2.client.notifications;
 
 import star.sequoia2.accessors.FeaturesAccessor;
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.IChatHud;
 import star.sequoia2.features.impl.Client;
 import net.minecraft.client.gui.hud.MessageIndicator;
@@ -13,7 +13,7 @@ import net.minecraft.util.Formatting;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class Notifications implements FeaturesAccessor {
 
@@ -43,16 +43,16 @@ public class Notifications implements FeaturesAccessor {
         if (notReady()) return;
 
         int color = feature(Client.class).getPrimaryColor();
-        MutableText prefix = Text.literal("[Nectar] ").withColor(color);
+        MutableText prefix = Text.literal("[Seq] ").withColor(color);
         if (message.getStyle().getColor() == null) {
             prefix.append(MutableText.of(message.getContent()).formatted(Formatting.WHITE));
         } else {
             prefix.append(message);
         }
-        var signature = prefix.toString() != null ? new MessageSignatureData(createSignature(Text.literal("[Nectar] ").withColor(color).toString() + sig)) : null;
+        var signature = prefix.toString() != null ? new MessageSignatureData(createSignature(Text.literal("[Seq] ").withColor(color).toString() + sig)) : null;
 
-//        ((IChatHud) mc.inGameHud.getChatHud()).nectar$remove(signature);
-        ((IChatHud) mc.inGameHud.getChatHud()).nectar$invokeAddMessage(prefix, signature, MessageIndicator.system());
+//        ((IChatHud) mc.inGameHud.getChatHud()).seq$remove(signature);
+        ((IChatHud) mc.inGameHud.getChatHud()).seq$invokeAddMessage(prefix, signature, MessageIndicator.system());
     }
 
 
@@ -74,6 +74,6 @@ public class Notifications implements FeaturesAccessor {
     }
 
     private static boolean notReady() {
-        return mc.inGameHud == null || !NectarClient.initialized;
+        return mc.inGameHud == null || !SeqClient.initialized;
     }
 }

@@ -28,15 +28,15 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Rename JAR to Nectar.jar
+      - name: Rename JAR to Seq.jar
         run: |
           JAR_FILE=$(find build/libs -name "*.jar")
-          echo "Renaming $JAR_FILE to Nectar.jar"
-          mv $JAR_FILE build/libs/Nectar.jar
+          echo "Renaming $JAR_FILE to Seq.jar"
+          mv $JAR_FILE build/libs/Seq.jar
 
 #      - name: Upload JAR
 #        run: |
-#          echo "Uploading Nectar.jar"
+#          echo "Uploading Seq.jar"
 #          curl -X POST -H "Content-Type: multipart/form-data" \
-#          -F "file=@build/libs/Nectar.jar" \
+#          -F "file=@build/libs/Seq.jar" \
 #          ${{ secrets.DISCORD_WEBHOOK_URL }}

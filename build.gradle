@@ -125,7 +125,7 @@ jar {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/nectar.accesswidener")
+    accessWidenerPath = file("src/main/resources/seq.accesswidener")
 }
 
 publishing {

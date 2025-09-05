@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin implements EventBusAccessor {
@@ -28,7 +28,7 @@ public class WorldRendererMixin implements EventBusAccessor {
         stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
         stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(mc.gameRenderer.getCamera().getYaw() + 180f));
 
-        profiler.push("nectar-render-3d");
+        profiler.push("seq-render-3d");
 
         dispatch(new Render3DEvent(stack, tickCounter.getTickDelta(true)));
         stack.pop();

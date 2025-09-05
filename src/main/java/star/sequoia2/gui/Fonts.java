@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class Fonts implements ConfigurationAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -36,7 +36,7 @@ public class Fonts implements ConfigurationAccessor {
 
     public void initializeFonts() throws IOException {
         fontRenderers.put("Minecraft", mc.textRenderer);
-        loadFontFromResource("Arial", "/assets/nectar/arialmdm.ttf", 8.5f, 2.0f, TrueTypeFontLoader.Shift.NONE, "");
+        loadFontFromResource("Arial", "/assets/seq/arialmdm.ttf", 8.5f, 2.0f, TrueTypeFontLoader.Shift.NONE, "");
 
         File fontsDirectory = new File(configuration().configDirectory(), "fonts");
         if (!fontsDirectory.exists()) {
@@ -101,7 +101,7 @@ public class Fonts implements ConfigurationAccessor {
             List<net.minecraft.client.font.Font.FontFilterPair> filters = new ArrayList<>();
             filters.add(new net.minecraft.client.font.Font.FontFilterPair(ttfFont, FontFilterType.FilterMap.NO_FILTER));
 
-            FontStorage fontStorage = new FontStorage(mc.getTextureManager(), Identifier.of("nectar", "font/" + fontKey.toLowerCase()));
+            FontStorage fontStorage = new FontStorage(mc.getTextureManager(), Identifier.of("seq", "font/" + fontKey.toLowerCase()));
             fontStorage.setFonts(filters, Set.of());
 
             TextRenderer textRenderer = new TextRenderer(id -> fontStorage, true);
@@ -125,7 +125,7 @@ public class Fonts implements ConfigurationAccessor {
         }
         String safeName = StringUtils.replace(FileNameUtils.getBaseName(fontFile.toPath()), " ", "");
         safeName = StringUtils.replace(safeName, "-", "").toLowerCase();
-        FontStorage fontStorage = new FontStorage(mc.getTextureManager(), Identifier.of("nectar", "font/" + safeName));
+        FontStorage fontStorage = new FontStorage(mc.getTextureManager(), Identifier.of("seq", "font/" + safeName));
         fontStorage.setFonts(list, Set.of());
         TextRenderer textRenderer = new TextRenderer(id -> fontStorage, true);
         fontRenderers.put(fontName, textRenderer);

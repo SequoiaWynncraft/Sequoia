@@ -10,7 +10,7 @@ import star.sequoia2.gui.screen.GuiRoot;
 import star.sequoia2.features.impl.Client;
 import org.lwjgl.glfw.GLFW;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 @Getter @Setter
 public class SearchBarComponent extends RelativeComponent implements TextRendererAccessor, RenderUtilAccessor {

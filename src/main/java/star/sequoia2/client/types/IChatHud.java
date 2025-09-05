@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 public interface IChatHud {
-    void nectar$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
+    void seq$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
 
-    void nectar$remove(@Nullable MessageSignatureData signature);
+    void seq$remove(@Nullable MessageSignatureData signature);
 }

@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class MessageAnalyzerFeature extends ToggleFeature implements NotificationsAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();

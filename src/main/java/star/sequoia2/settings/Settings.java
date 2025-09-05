@@ -1,7 +1,6 @@
 package star.sequoia2.settings;
 
 import mil.nga.color.Color;
-import op.legends.nectar.settings.types.*;
 import star.sequoia2.settings.types.*;
 
 import java.util.Comparator;

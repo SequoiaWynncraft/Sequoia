@@ -1,6 +1,6 @@
 package star.sequoia2.utils;
 
-import star.sequoia2.client.NectarClient;
+import star.sequoia2.client.SeqClient;
 
 import java.awt.*;
 
@@ -17,12 +17,12 @@ public final class Themes {
     private final Timer colorTimer = new Timer();
 
     public Color getThemeColor(float colorOffset) {
-        return getThemeColor(colorOffset, 1, NectarClient.clientModule.get().themeControlEnumSetting.get());
+        return getThemeColor(colorOffset, 1, SeqClient.clientModule.get().themeControlEnumSetting.get());
     }
 
     public Color getThemeColor(float offset, float multiplier, Theme control) {
-        Color primary = new Color(NectarClient.clientModule.get().getPrimaryColor());
-        Color secondary = new Color(NectarClient.clientModule.get().getSecondaryColor());
+        Color primary = new Color(SeqClient.clientModule.get().getPrimaryColor());
+        Color secondary = new Color(SeqClient.clientModule.get().getSecondaryColor());
 
         if (colorTimer.passed(2500)) {
             colorTimer.reset();

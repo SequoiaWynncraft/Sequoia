@@ -17,8 +17,8 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import static star.sequoia2.client.NectarClient.SERVERADDENDPOINT;
-import static star.sequoia2.client.NectarClient.mc;
+import static star.sequoia2.client.SeqClient.SERVERADDENDPOINT;
+import static star.sequoia2.client.SeqClient.mc;
 
 public final class Http {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -37,7 +37,7 @@ public final class Http {
                 .uri(uri)
                 .timeout(Duration.ofSeconds(10))
                 .header("Accept", "application/json")
-                .header("User-Agent", "NectarClient/1.0 (+https://youtube.com/@theoplegends)")
+                .header("User-Agent", "SeqClient/1.0 (+https://youtube.com/@theoplegends)")
                 .GET()
                 .build();
 
