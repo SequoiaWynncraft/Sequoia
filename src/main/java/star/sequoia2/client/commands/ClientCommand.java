@@ -9,7 +9,9 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import org.java_websocket.client.WebSocketClient;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.command.Command;
+import star.sequoia2.client.types.ws.message.ws.GClientCommandWSMessage;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
@@ -42,16 +44,16 @@ public class ClientCommand extends Command {
     }
 
     private int sendClientCommand(CommandContext<FabricClientCommandSource> ctx, String cmd, String args) {
-        if (!Sequoia2.getWebSocketFeature().isEnabled()) {
+        if (!SeqClient.getWebSocketFeature().isEnabled()) {
             ctx.getSource().sendError(
-                    Sequoia2.prefix(Text.translatable("sequoia.feature.webSocket.featureDisabled")));
+                    SeqClient.prefix(Text.translatable("sequoia.feature.webSocket.featureDisabled")));
             return 1;
         }
 
-        WebSocketClient ws = Sequoia2.getWebSocketFeature().getClient();
+        WebSocketClient ws = SeqClient.getWebSocketFeature().getClient();
         if (ws == null || !ws.isOpen()) {
             ctx.getSource().sendError(
-                    Sequoia2.prefix(Text.translatable("sequoia.command.ws.notConnected")));
+                    SeqClient.prefix(Text.translatable("sequoia.command.ws.notConnected")));
             return 1;
         }
 
@@ -59,7 +61,7 @@ public class ClientCommand extends Command {
         GClientCommandWSMessage.Data payload = new GClientCommandWSMessage.Data(cmd, args);
         GClientCommandWSMessage message = new GClientCommandWSMessage(payload);
 
-        Sequoia2.getWebSocketFeature().sendMessage(message);
+        SeqClient.getWebSocketFeature().sendMessage(message);
 
         return 1;
     }

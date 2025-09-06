@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
-import star.sequoia2.Sequoia2;
 
 import java.io.IOException;
 import java.net.URI;

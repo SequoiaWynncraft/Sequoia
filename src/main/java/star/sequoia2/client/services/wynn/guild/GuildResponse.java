@@ -531,7 +531,7 @@ public class GuildResponse implements TeXParserAccessor {
                 + onlineMembers.getCaptain().size()
                 + onlineMembers.getRecruiter().size()
                 + onlineMembers.getRecruit().size());
-        Sequoia2.debug(name + "'s online guild members: " + onlineMembers);
+        SeqClient.debug(name + "'s online guild members: " + onlineMembers);
         return onlineMembers;
     }
 

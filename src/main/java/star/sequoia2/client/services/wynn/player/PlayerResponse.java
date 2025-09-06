@@ -101,7 +101,7 @@ public class PlayerResponse implements TeXParserAccessor {
         }
     }
 
-    public static class GlobalData {
+    public class GlobalData {
         private int wars;
         private int totalLevels;
         private int killedMobs;
@@ -197,7 +197,7 @@ public class PlayerResponse implements TeXParserAccessor {
 
         }
 
-        public static class Raids {
+        public class Raids {
             private static final Map<String, String> RAID_NAME_TO_RAID_LEADERBOARD_MAP = Map.of(
                     "The Canyon Colossus", "colossusCompletion",
                     "Orphion's Nexus of Light", "orphionCompletion",

@@ -9,7 +9,10 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.services.wynn.guild.GuildResponse;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
+import star.sequoia2.client.types.command.suggestions.GuildSuggestionProvider;
+import star.sequoia2.utils.cache.GuildCache;
 
 import java.util.List;
 
@@ -48,8 +51,8 @@ public class OnlineMembersCommand extends Command {
 
         Services.Guild.getGuild(query).whenComplete((g, t) -> {
             if (t != null) {
-                Sequoia2.error("Error looking up guild " + query, t);
-                ctx.getSource().sendError(Sequoia2.prefix(Text.translatable(
+                SeqClient.error("Error looking up guild " + query, t);
+                ctx.getSource().sendError(SeqClient.prefix(Text.translatable(
                         "sequoia.command.onlineMembers.errorLookingUpGuildMembers", query)));
                 return;
             }
@@ -57,10 +60,10 @@ public class OnlineMembersCommand extends Command {
                 GuildCache.canonicalName(raw).ifPresentOrElse(
                         canon -> Services.Guild.getGuild(canon).whenComplete((g2, t2) -> {
                             if (g2 != null) showGuild(ctx, g2);
-                            else ctx.getSource().sendError(Sequoia2.prefix(
+                            else ctx.getSource().sendError(SeqClient.prefix(
                                     Text.translatable("sequoia.command.onlineMembers.guildNotFound", raw)));
                         }),
-                        () -> ctx.getSource().sendError(Sequoia2.prefix(
+                        () -> ctx.getSource().sendError(SeqClient.prefix(
                                 Text.translatable("sequoia.command.onlineMembers.guildNotFound", raw)))
                 );
             } else {

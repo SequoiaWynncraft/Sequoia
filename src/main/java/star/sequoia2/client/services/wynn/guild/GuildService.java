@@ -1,6 +1,7 @@
 package star.sequoia2.client.services.wynn.guild;
 
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.types.Service;
 import star.sequoia2.http.HttpClients;
 import star.sequoia2.utils.URLUtils;
 

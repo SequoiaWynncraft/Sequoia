@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.accessors.TeXParserAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.services.wynn.player.PlayerResponse;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.SuggestionProviders;
 import star.sequoia2.utils.MinecraftUtils;
@@ -58,16 +59,16 @@ public class PlayerInfoCommand extends Command implements TeXParserAccessor {
         } else {
             Services.Player.getPlayerFullResult(username).whenComplete((playerResponse, throwable) -> {
                 if (throwable != null) {
-                    Sequoia2.error("Error looking up player: " + username, throwable);
+                    SeqClient.error("Error looking up player: " + username, throwable);
                     ctx.getSource()
-                            .sendError(Sequoia2.prefix(Text.translatable(
+                            .sendError(SeqClient.prefix(Text.translatable(
                                     "sequoia.command.playerInfo.errorLookingUpPlayer", username)));
                 } else {
                     if (playerResponse == null
                             || playerResponse.getGlobalData() == null
                             || playerResponse.getGlobalData().getRaids() == null) {
                         ctx.getSource()
-                                .sendError(Sequoia2.prefix(Text.translatable(
+                                .sendError(SeqClient.prefix(Text.translatable(
                                         "sequoia.command.playerRaids.playerNotFound", username)));
                     } else {
                         PlayerResponse.Guild guild = playerResponse.getGuild();
@@ -77,7 +78,7 @@ public class PlayerInfoCommand extends Command implements TeXParserAccessor {
                         if (playerResponse.getSupportRank() == null){
                             Rank = "";
                         }else{
-                            Sequoia2.info(playerResponse.getRank());
+                            SeqClient.info(playerResponse.getRank());
                         switch(playerResponse.getSupportRank().toUpperCase(Locale.ROOT)) {
                             case "VIP":
                                 Rank = "\uE023";
@@ -175,34 +176,34 @@ public class PlayerInfoCommand extends Command implements TeXParserAccessor {
 
                         ctx.getSource()
                                 .sendFeedback(
-                                        Sequoia2.prefix(
-                                                parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoIntro",
+                                        SeqClient.prefix(
+                                                teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoIntro",
                                                         playerResponse.getLegacyRankColour() != null ? playerResponse.getLegacyRankColour().getMain().substring(1) : "ffffff", Rank + " ",
                                                         playerResponse.getUsername())
                                                 ).append(guild != null ?
-                                                parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoGuild",
+                                                teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoGuild",
                                                         TextUtils.upperfirst(guild.getRank()),
                                                         guild.getName(), guild.getName(), guild.getName(), String.format("%06X", Models.Guild.getColor(guild.getName()).asInt() & 0xFFFFFF), guild.getPrefix()
                                                         )) : Text.empty()
                                                 ).append(playerResponse.getCharacters() != null ?
-                                                parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoBody",
+                                                teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoBody",
                                                         playerResponse.getUsername(), playerResponse.getUsername(), playerResponse.getGlobalData().getRaids().getTotal(),
                                                         playerResponse.getUsername(), playerResponse.getUsername(), playerResponse.getGlobalData().getWars(), playerResponse.getRanking().get("warsCompletion"),
                                                         playerResponse.getGlobalData().getKilledMobs(), playerResponse.getGlobalData().getChestsFound(), professions(playerResponse.getCharacters()),
                                                         TimeUtils.toReadable(playerResponse.getFirstJoin()), (int) playerResponse.getPlaytime() + " hours"
-                                                        )): parseMutableText(I18n.translate("sequoia.command.playerInfo.showingplayerInfoBodyError",""))
+                                                        )): teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingplayerInfoBodyError",""))
                                                 ).append(
                                                 playerResponse.isOnline()
                                                 ?
                                                         playerResponse.getCharacters() != null ?
-                                                        parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoOnline",
+                                                            teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoOnline",
                                                                 PlayerCharactersCommand.characterText(playerResponse.getCharacters().get(character)), playerResponse.getServer()
                                                         )): Text.empty()
                                                 :
                                                         playerResponse.getLastJoin() != null?
-                                                        parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoOffline",
+                                                            teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingPlayerInfoOffline",
                                                                 TimeUtils.since(playerResponse.getLastJoin())
-                                                        )): parseMutableText(I18n.translate("sequoia.command.playerInfo.showingplayerInfoOnlineError", ""))
+                                                        )): teXParser().parseMutableText(I18n.translate("sequoia.command.playerInfo.showingplayerInfoOnlineError", ""))
                                                 )
                                         )
                                 );

@@ -10,10 +10,13 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.services.wynn.guild.GuildResponse;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.SuggestionProviders;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.utils.cache.GuildCache;
 
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static star.sequoia2.utils.text.TextUtils.padInvisible;
 
-public class CompareCommand extends Command {
+public class CompareCommand extends Command implements FeaturesAccessor {
 
     @Override
     public String getCommandName() {
@@ -131,17 +134,17 @@ public class CompareCommand extends Command {
 
         /* ---- styled pieces ---------------------------------------------- */
 
-        MutableText name1Text = Text.literal(name1).styled(selectedTheme.accent1());
-        MutableText name2Text = Text.literal(name2).styled(selectedTheme.accent1());
+        MutableText name1Text = Text.literal(name1).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent1()).orElse(style -> style));
+        MutableText name2Text = Text.literal(name2).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent1()).orElse(style -> style));
 
         MutableText tag1Text = buildGuildTag(tagRaw1, name1);
         MutableText tag2Text = buildGuildTag(tagRaw2, name2);
 
         Function<String, MutableText> num1 =
-                s -> Text.literal(s).styled(selectedTheme.accent3());
+                s -> Text.literal(s).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent3()).orElse(style -> style));
 
         Function<String, MutableText> num2 =
-                s -> Text.literal(s).styled(selectedTheme.accent3());
+                s -> Text.literal(s).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent3()).orElse(style -> style));
 
 
         /* ---- rows ------------------------------------------------------- */
@@ -167,7 +170,7 @@ public class CompareCommand extends Command {
 
         /* ---- assemble & send ------------------------------------------- */
 
-        MutableText out = SeqClient.prefix(Text.translatable("sequoia.command.compare.compareGuild").styled(selectedTheme.light()).append(Text.literal("\n")));
+        MutableText out = SeqClient.prefix(Text.translatable("sequoia.command.compare.compareGuild").styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style)).append(Text.literal("\n")));
         for (int i = 0; i < rows.size(); i++) {
             out.append(rows.get(i));
             if (i < rows.size() - 1) out.append("\n");
@@ -180,12 +183,12 @@ public class CompareCommand extends Command {
     // --------------------------------------------------------------------- //
 
     /** tag with light brackets + accent2 prefix */
-    private static MutableText buildGuildTag(String rawTag, String guildName) {
+    private MutableText buildGuildTag(String rawTag, String guildName) {
         String inner = rawTag.substring(1, rawTag.length() - 1); // strip [ ]
         return Text.literal("[")
-                .styled(selectedTheme.light())
+                .styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style))
                 .append(Text.literal(inner).styled(s -> s.withColor(Models.Guild.getColor(guildName).asInt())))
-                .append(Text.literal("]").styled(selectedTheme.light()));
+                .append(Text.literal("]").styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style)));
     }
 
     /** build one row:  label | col1 | col2  (pixel-padded) */
@@ -198,13 +201,13 @@ public class CompareCommand extends Command {
                                       TextRenderer tr) {
 
         String lblPad = padInvisible(tr, labelRaw, labelPx);
-        MutableText label = Text.literal(lblPad).styled(selectedTheme.dark());
+        MutableText label = Text.literal(lblPad).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().dark()).orElse(style -> style));
 
         int need = Math.max(0, col1Px - tr.getWidth(col1Raw));
         String colPad = padInvisible(tr, "", need);
         MutableText col1 = Text.literal(colPad).append(col1Styled);
 
-        MutableText bar = Text.literal(" | ").styled(selectedTheme.normal());
+        MutableText bar = Text.literal(" | ").styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().normal()).orElse(style -> style));
 
         return label.append(bar)
                 .append(col1)
@@ -224,8 +227,8 @@ public class CompareCommand extends Command {
         String col2Raw = fmt(value2, value2 - value1);
 
         /* style numbers with accent3 -------------------------------- */
-        MutableText col1Styled = Text.literal(col1Raw).styled(selectedTheme.accent3());
-        MutableText col2Styled = Text.literal(col2Raw).styled(selectedTheme.accent3());
+        MutableText col1Styled = Text.literal(col1Raw).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent3()).orElse(style -> style));
+        MutableText col2Styled = Text.literal(col2Raw).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent3()).orElse(style -> style));
 
         return buildGuildRow(labelRaw, col1Raw, col1Styled, col2Styled,
                 labelPx, col1Px, tr);

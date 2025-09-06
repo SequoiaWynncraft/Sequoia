@@ -32,14 +32,4 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
         json.putString("value", get().name());
         return json;
     }
-
-    @Override
-    public String toPrintableValue() {
-        return get().name();
-    }
-
-    @Override
-    public void parseValueFromCommand(String value) {
-        Enum.valueOf(enumClazz, value.toUpperCase());
-    }
 }

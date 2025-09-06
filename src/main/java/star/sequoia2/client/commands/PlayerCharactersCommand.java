@@ -9,9 +9,12 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.accessors.TeXParserAccessor;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.services.wynn.player.PlayerResponse;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.SuggestionProviders;
+import star.sequoia2.utils.MinecraftUtils;
 import star.sequoia2.utils.text.TextUtils;
 
 import java.util.*;
@@ -49,21 +52,21 @@ public class PlayerCharactersCommand extends Command implements TeXParserAccesso
         String username = ctx.getArgument("player", String.class);
         if (StringUtils.isBlank(username) || !MinecraftUtils.isValidUsername(username)) {
             ctx.getSource()
-                    .sendError(Sequoia2.prefix(Text.translatable("sequoia.command.invalidUsername")));
+                    .sendError(SeqClient.prefix(Text.translatable("sequoia.command.invalidUsername")));
             return 0;
         } else {
             Services.Player.getPlayerFullResult(username).whenComplete((playerResponse, throwable) -> {
                 if (throwable != null) {
-                    Sequoia2.error("Error looking up player: " + username, throwable);
+                    SeqClient.error("Error looking up player: " + username, throwable);
                     ctx.getSource()
-                            .sendError(Sequoia2.prefix(Text.translatable(
+                            .sendError(SeqClient.prefix(Text.translatable(
                                     "sequoia.command.playerInfo.errorLookingUpPlayer", username)));
                 } else {
                     if (playerResponse == null
                             || playerResponse.getGlobalData() == null
                             || playerResponse.getGlobalData().getRaids() == null) {
                         ctx.getSource()
-                                .sendError(Sequoia2.prefix(Text.translatable(
+                                .sendError(SeqClient.prefix(Text.translatable(
                                         "sequoia.command.playerRaids.playerNotFound", username)));
                     } else {
                         StringBuilder TeX = new StringBuilder();
@@ -78,7 +81,7 @@ public class PlayerCharactersCommand extends Command implements TeXParserAccesso
                                         .reversed()).forEach(c -> {
                             TeX.append(characterText(c)).append("\\n");
                         });
-                        ctx.getSource().sendFeedback(Sequoia2.prefix(teXParser().parseMutableText(TeX.substring(0, TeX.length()-2))));
+                        ctx.getSource().sendFeedback(SeqClient.prefix(teXParser().parseMutableText(TeX.substring(0, TeX.length()-2))));
                     }
                 }
 
@@ -88,7 +91,7 @@ public class PlayerCharactersCommand extends Command implements TeXParserAccesso
     }
 
     public static String characterText(PlayerResponse.Character character) {
-        Sequoia2.debug(String.format("\\hover{%s}{\\-{[}\\2{%d}\\-{]}%s \\1{%s}\\nickname{%s}}", characterHoverText(character), character.getLevel(), gamemodeText(character),
+        SeqClient.debug(String.format("\\hover{%s}{\\-{[}\\2{%d}\\-{]}%s \\1{%s}\\nickname{%s}}", characterHoverText(character), character.getLevel(), gamemodeText(character),
                 TextUtils.upperfirst(character.getType()), character.getNickname()));
         return String.format("\\hover{%s}{\\-{[}\\2{%d}\\-{]}%s \\1{%s}\\nickname{%s}}", characterHoverText(character), character.getLevel(), gamemodeText(character),
                 TextUtils.upperfirst(character.getType()), character.getNickname());

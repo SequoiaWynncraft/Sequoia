@@ -23,14 +23,4 @@ public class DoubleSetting extends NumberSetting<Double> {
         json.putDouble("value", get());
         return json;
     }
-
-    @Override
-    public String toPrintableValue() {
-        return String.format("%." + scale + "f", get());
-    }
-
-    @Override
-    public void parseValueFromCommand(String value) {
-        set(Double.parseDouble(value));
-    }
 }

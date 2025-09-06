@@ -1,10 +1,11 @@
 package star.sequoia2.client.types.ws.message.ws;
 
 import com.google.gson.annotations.SerializedName;
-import star.sequoia2.core.ws.message.WSMessage;
-import star.sequoia2.core.ws.type.WSMessageType;
+import star.sequoia2.client.types.ws.message.WSMessage;
+import star.sequoia2.client.types.ws.type.WSMessageType;
 
-import static star.sequoia2.core.ws.WSConstants.GSON;
+import static star.sequoia2.client.types.ws.WSConstants.GSON;
+
 
 public class GIdentifyWSMessage extends WSMessage {
     public GIdentifyWSMessage(Data data) {

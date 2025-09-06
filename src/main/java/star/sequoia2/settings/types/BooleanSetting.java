@@ -21,23 +21,4 @@ public class BooleanSetting extends Setting<Boolean> {
         json.putBoolean("value", get());
         return json;
     }
-
-    @Override
-    public String toPrintableValue() {
-        return get() ? "on" : "off";
-    }
-
-    @Override
-    public void parseValueFromCommand(String value) {
-        switch (value.toLowerCase()) {
-            case "on":
-            case "true":
-                set(true);
-                break;
-            case "off":
-            case "false":
-                set(false);
-                break;
-        }
-    }
 }

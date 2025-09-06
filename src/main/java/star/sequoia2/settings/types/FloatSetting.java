@@ -24,13 +24,4 @@ public class FloatSetting extends NumberSetting<Float> {
         return json;
     }
 
-    @Override
-    public String toPrintableValue() {
-        return String.format("%." + scale + "f", get());
-    }
-
-    @Override
-    public void parseValueFromCommand(String value) {
-        set(Float.parseFloat(value));
-    }
 }

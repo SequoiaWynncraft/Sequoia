@@ -32,33 +32,7 @@ public class ConfigCommand extends Command {
         );
 
     }public static void tryOpenConfigGUI(){
-        try {
-            Class<?> configScreenProvidersClass = Class.forName("io.wispforest.owo.config.ui.ConfigScreenProviders");
-            Method getMethod = configScreenProvidersClass.getMethod("get", String.class);
-            Function<Object, ConfigScreen> configScreenProvider =
-                    (Function<Object, ConfigScreen>) getMethod.invoke(null, SeqClient.MOD_ID);
-
-            if (configScreenProvider == null) {
-                SeqClient.error("No ConfigScreenProvider found for mod ID: " + SeqClient.MOD_ID
-                        + ", do you have owo-lib installed?");
-            }
-
-            Object screen = configScreenProvider.apply(null);
-            if (screen instanceof Screen) {
-                SeqClient.debug("Attempting to open ConfigScreen for mod ID: " + SeqClient.MOD_ID);
-                Executors.newSingleThreadScheduledExecutor()
-                        .schedule(
-                                () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance()
-                                        .setScreen((Screen) screen)),
-                                1,
-                                TimeUnit.MILLISECONDS);
-            } else {
-                SeqClient.error("ConfigScreenProvider returned unexpected Screen type: "
-                        + screen.getClass().getName());
-            }
-        } catch (Exception exception) {
-            SeqClient.error("Failed to open ConfigScreen", exception);
-        }
+        //open
     }
 
     private int tryOpenConfigGUI(CommandContext<FabricClientCommandSource> context) {

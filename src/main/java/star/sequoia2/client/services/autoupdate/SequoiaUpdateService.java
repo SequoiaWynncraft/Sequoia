@@ -3,6 +3,7 @@ package star.sequoia2.client.services.autoupdate;
 import com.google.gson.JsonObject;
 import com.wynntils.utils.FileUtils;
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.types.Service;
 
 import java.io.File;
 import java.io.IOException;

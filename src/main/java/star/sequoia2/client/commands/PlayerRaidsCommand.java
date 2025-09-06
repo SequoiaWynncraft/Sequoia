@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.accessors.TeXParserAccessor;
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.SuggestionProviders;
 import star.sequoia2.utils.MinecraftUtils;

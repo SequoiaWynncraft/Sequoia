@@ -15,9 +15,9 @@ import net.minecraft.client.realms.dto.PlayerInfo;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
-import star.sequoia2.Sequoia2;
-import star.sequoia2.core.components.Services;
-import star.sequoia2.mc.MinecraftUtils;
+import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.types.Services;
+import star.sequoia2.utils.MinecraftUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -151,7 +151,7 @@ public final class WynnUtils {
     public static CompletableFuture<Boolean> isSequoiaGuildMember() {
         return Services.Player.getPlayer(McUtils.playerName()).thenApplyAsync(playerResponse -> {
             if (playerResponse == null) {
-                Sequoia2.debug("playerResponse is null, querying Character Info for guild info");
+                SeqClient.debug("playerResponse is null, querying Character Info for guild info");
 
                 QueryBuilder queryBuilder = ScriptedContainerQuery.builder("Character Info Query");
                 queryBuilder.onError(msg -> WynntilsMod.warn("Error querying Character Info: " + msg));
@@ -165,7 +165,7 @@ public final class WynnUtils {
                 return StringUtils.equals(Models.Guild.getGuildName(), "Sequoia");
             }
 
-            Sequoia2.debug(playerResponse.getUsername() + "'s guild: "
+            SeqClient.debug(playerResponse.getUsername() + "'s guild: "
                     + playerResponse.getGuild().getName());
             return playerResponse.getGuild() != null && StringUtils.equals(playerResponse.getGuild().getName(), "Sequoia");
         });

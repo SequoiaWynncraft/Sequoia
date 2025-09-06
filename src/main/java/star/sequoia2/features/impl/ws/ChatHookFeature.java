@@ -5,13 +5,14 @@ import com.wynntils.core.text.StyledText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import star.sequoia2.accessors.GuildParserAccessor;
+import star.sequoia2.accessors.TeXParserAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.events.ChatMessageEvent;
 import star.sequoia2.features.ToggleFeature;
 
 import java.util.regex.Pattern;
 
-public class ChatHookFeature extends ToggleFeature implements GuildParserAccessor {
+public class ChatHookFeature extends ToggleFeature implements GuildParserAccessor, TeXParserAccessor {
 
     public ChatHookFeature() {
         super("ChatHook", "Chat related stuffs (type shi)");
@@ -77,7 +78,7 @@ public class ChatHookFeature extends ToggleFeature implements GuildParserAccesso
 //            "[12:12:02] [Render thread/INFO] (sequoia2) [VERBOSE] [CHAT] §b\uDAFF\uDFFC\uE006\uDAFF\uDFFF\uE002\uDAFF\uDFFE §ebad_and_sad§b, §eMasss§b, §e§owar tank§b, and §e§oTotal Obliteration§b finished §3The Nameless §b\uDAFF\uDFFC\uE001\uDB00\uDC06§3 Anomaly§b and claimed §32x Aspects§b, §32048x §b\uDAFF\uDFFC\uE001\uDB00\uDC06§3 Emeralds§b, and §3+10367m Guild Experience\n"
         StyledText styledText = StyledText.fromComponent(message);
 
-        String tex = toTeX(styledText.stripAlignment());
+        String tex = teXParser().toTeX(styledText.stripAlignment());
 
         SeqClient.debug(tex);
 
