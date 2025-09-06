@@ -60,6 +60,9 @@ repositories {
         name = "jitpack"
         url = "https://jitpack.io"
     }
+    maven {
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
@@ -75,6 +78,12 @@ dependencies {
     include group: 'mil.nga', name: 'color', version: '1.0.0'
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    include("org.java-websocket:Java-WebSocket:$project.web_socket_version")
+    implementation("org.java-websocket:Java-WebSocket:${project.web_socket_version}")
+
+    modImplementation "maven.modrinth:wynntils:v${project.wynntils_version}-fabric"
+    modRuntimeOnly "maven.modrinth:wynntils:v${project.wynntils_version}-fabric"
 
     //devauth
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")

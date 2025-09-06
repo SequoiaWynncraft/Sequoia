@@ -7,7 +7,7 @@ import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.TextRendererAccessor;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.screen.GuiRoot;
-import star.sequoia2.features.impl.Client;
+import star.sequoia2.features.impl.Settings;
 import org.lwjgl.glfw.GLFW;
 
 import static star.sequoia2.client.SeqClient.mc;
@@ -37,10 +37,10 @@ public class SearchBarComponent extends RelativeComponent implements TextRendere
 
         if (searching) {
             display = search.isEmpty() ? "" : search;
-            features().get(Client.class).map(Client::getClickGui).orElseThrow().setCloseOnEscape(false);
+            features().get(Settings.class).map(Settings::getClickGui).orElseThrow().setCloseOnEscape(false);
         } else {
             display = "§8Click to search";
-            features().get(Client.class).map(Client::getClickGui).orElseThrow().setCloseOnEscape(true);
+            features().get(Settings.class).map(Settings::getClickGui).orElseThrow().setCloseOnEscape(true);
         }
 
         float scale = 1.5f;

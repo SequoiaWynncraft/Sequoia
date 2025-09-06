@@ -3,7 +3,7 @@ package star.sequoia2.client.notifications;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.IChatHud;
-import star.sequoia2.features.impl.Client;
+import star.sequoia2.features.impl.Settings;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.MutableText;
@@ -42,7 +42,7 @@ public class Notifications implements FeaturesAccessor {
     public void sendMessage(Text message, String sig) {
         if (notReady()) return;
 
-        int color = feature(Client.class).getPrimaryColor();
+        int color = feature(Settings.class).getPrimaryColor();
         MutableText prefix = Text.literal("[Seq] ").withColor(color);
         if (message.getStyle().getColor() == null) {
             prefix.append(MutableText.of(message.getContent()).formatted(Formatting.WHITE));

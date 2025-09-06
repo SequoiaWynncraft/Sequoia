@@ -2,8 +2,6 @@ package star.sequoia2.utils.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import star.sequoia2.accessors.TextRendererAccessor;
-import star.sequoia2.gui.screen.ClickGUIScreen;
 import mil.nga.color.Color;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
@@ -21,6 +19,8 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import star.sequoia2.accessors.TextRendererAccessor;
+import star.sequoia2.gui.screen.ClickGUIScreen;
 
 import static star.sequoia2.client.SeqClient.mc;
 

@@ -8,7 +8,10 @@ import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
 import lombok.Getter;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import star.sequoia2.accessors.EventBusAccessor;
 import star.sequoia2.client.commands.Commands;
@@ -16,24 +19,35 @@ import star.sequoia2.client.notifications.Notifications;
 import star.sequoia2.configuration.Configuration;
 import star.sequoia2.events.MinecraftFinishedLoading;
 import star.sequoia2.features.Features;
-import star.sequoia2.features.impl.Client;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.features.impl.RenderTest;
 import star.sequoia2.gui.Fonts;
 import star.sequoia2.gui.categories.Categories;
 import star.sequoia2.settings.SettingsState;
-import star.sequoia2.utils.Themes;
+import star.sequoia2.utils.chatparser.GuildMessageParser;
+import star.sequoia2.utils.chatparser.GuildRaidParser;
+import star.sequoia2.utils.render.Themes;
 import star.sequoia2.utils.render.Render2DUtil;
 import star.sequoia2.utils.render.Render3DUtil;
+import star.sequoia2.utils.text.parser.TeXParser;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public static String MOD_ID = "seq";
+
+    @Getter
+    public static String version = "0.0.4.0";
+
     public static boolean initialized = false;
 
+    public static boolean debugMode = true;
+
     public static final MinecraftClient mc = MinecraftClient.getInstance();
-    public static final String SERVERADDENDPOINT = "http://replaceme/api/raids/add";
 
     @Getter
     private static EventBus eventBus;
@@ -51,9 +65,6 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private static SettingsState settings;
 
     @Getter
-    private static Commands commands;
-
-    @Getter
     private static Fonts fonts;
 
     @Getter
@@ -67,6 +78,15 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
     @Getter
     private static SimpleProfileFetcher profileFetcher;
+
+    @Getter
+    private static GuildMessageParser guildMessageParser;
+
+    @Getter
+    private static GuildRaidParser guildRaidParser;
+
+    @Getter
+    private static TeXParser teXParser;
 
     @Override
     public void onInitializeClient() {
@@ -99,7 +119,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
         settings.load(features);
 
-        commands = new Commands();
+        ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
 
         Categories.registerDefault();
 
@@ -111,26 +131,75 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     public void onFinishedLoadingOnUI(MinecraftFinishedLoading ignored) {
         try {
             fonts.initializeFonts();
+            teXParser = new TeXParser();
             profileFetcher = new SimpleProfileFetcher(); //init late so hopefully service is created
+            guildMessageParser = new GuildMessageParser();
+            guildRaidParser = new GuildRaidParser();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void registerFeatures() {
-        features.add(new Client()); // always first so you can get colors
+        features.add(new Settings()); // always first so you can get colors
         features.add(new RenderTest());
     }
 
-    public static Supplier<Client> clientModule = Suppliers
-            .memoize(() -> features.get(Client.class)
-                    .orElseThrow(() -> new IllegalStateException("Client feature was not registered")));
+    public static Supplier<Settings> clientModule = Suppliers
+            .memoize(() -> features.get(Settings.class)
+                    .orElseThrow(() -> new IllegalStateException("Settings feature was not registered")));
 
     public static void reloadConfiguration() {
         try {
             configuration = new Configuration();
         } catch (IOException e) {
             throw new RuntimeException("Failed to reload configuration", e);
+        }
+    }
+
+    public static final ScheduledExecutorService SCHEDULER =
+            Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "Sequoia-Scheduler");
+                t.setDaemon(true);
+                return t;
+            });
+
+    public static MutableText prefix(Text text) {
+        return teXParser.parseMutableText("\\pill{%s}{%s}{Sequoia} \\+{»} ",
+                Integer.toHexString(features.get(Settings.class).map(settingsFeature -> settingsFeature.getTheme().get().getTheme().DARK).orElse(0x6600cc)),
+                Integer.toHexString(features.get(Settings.class).map(settingsFeature -> settingsFeature.getTheme().get().getTheme().LIGHT).orElse(0xf3e6ff))).append(text);
+//        return Text.empty()
+//                .append(Text.literal("SequoiaMod")
+//                        .styled(selectedTheme.normal()))
+//                .append(Text.literal(" » ")
+//                        .styled(selectedTheme.dark()))
+//                .append(Text.empty()
+//                        .styled(selectedTheme.light())).append(text);
+    }
+
+    public static void error(String message) {
+        LOGGER.error(message);
+    }
+
+    public static void error(String message, Throwable t) {
+        LOGGER.error(message, t);
+    }
+
+    public static void warn(String message) {
+        LOGGER.warn(message);
+    }
+
+    public static void warn(String message, Throwable throwable) {
+        LOGGER.warn(message, throwable);
+    }
+
+    public static void info(String message) {
+        LOGGER.info(message);
+    }
+
+    public static void debug(String message) {
+        if (debugMode) {
+            LOGGER.info("[VERBOSE] {}", message);
         }
     }
 }

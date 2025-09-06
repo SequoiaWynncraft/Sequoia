@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import star.sequoia2.configuration.JsonCompound;
-import star.sequoia2.settings.CommandSupport;
 import star.sequoia2.settings.Setting;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListSetting<T> extends Setting<List<T>> implements CommandSupport {
+public class ListSetting<T> extends Setting<List<T>> {
 
     private final List<?> allowedGroups;
 
@@ -131,26 +130,5 @@ public class ListSetting<T> extends Setting<List<T>> implements CommandSupport {
         json.put("value", array);
         json.putBoolean("whitelist", this.whitelist);
         return json;
-    }
-
-    @Override
-    public String toPrintableValue() {
-        return get().stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(", ", "[", "]"));
-    }
-
-    @Override
-    public void parseValueFromCommand(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            set(new ArrayList<>());
-            return;
-        }
-        String[] parts = value.split(",");
-        List<T> list = new ArrayList<>();
-        for (String part : parts) {
-            list.add((T) part.trim());
-        }
-        set(list);
     }
 }

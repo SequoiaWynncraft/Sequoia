@@ -2,9 +2,8 @@ package star.sequoia2.settings.types;
 
 
 import star.sequoia2.configuration.JsonCompound;
-import star.sequoia2.settings.CommandSupport;
 
-public class DoubleSetting extends NumberSetting<Double> implements CommandSupport {
+public class DoubleSetting extends NumberSetting<Double> {
 
     public DoubleSetting(int ordinal, String name, String description, Double defaultValue, Double value, Double min, Double max) {
         super(ordinal, name, description, defaultValue, value, min, max);

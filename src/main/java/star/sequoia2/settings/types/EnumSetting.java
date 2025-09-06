@@ -1,11 +1,9 @@
 package star.sequoia2.settings.types;
 
-
 import star.sequoia2.configuration.JsonCompound;
-import star.sequoia2.settings.CommandSupport;
 import star.sequoia2.settings.Setting;
 
-public class EnumSetting<T extends Enum<T>> extends Setting<T> implements CommandSupport {
+public class EnumSetting<T extends Enum<T>> extends Setting<T> {
 
     private final Class<T> enumClazz;
 

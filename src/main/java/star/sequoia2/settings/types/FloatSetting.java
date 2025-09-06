@@ -2,9 +2,8 @@ package star.sequoia2.settings.types;
 
 
 import star.sequoia2.configuration.JsonCompound;
-import star.sequoia2.settings.CommandSupport;
 
-public class FloatSetting extends NumberSetting<Float> implements CommandSupport {
+public class FloatSetting extends NumberSetting<Float> {
 
     public FloatSetting(int ordinal, String name, String description, Float defaultValue, Float value, Float min, Float max) {
         super(ordinal, name, description, defaultValue, value, min, max);

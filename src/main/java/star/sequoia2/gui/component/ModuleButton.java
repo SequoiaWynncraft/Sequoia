@@ -11,7 +11,7 @@ import star.sequoia2.gui.component.settings.impl.KeybindSettingComponent;
 import star.sequoia2.gui.screen.GuiRoot;
 import star.sequoia2.features.Feature;
 import star.sequoia2.features.ToggleFeature;
-import star.sequoia2.features.impl.Client;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.settings.Setting;
 import lombok.Getter;
 import mil.nga.color.Color;
@@ -54,7 +54,7 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
 
     @Override
     public void render(DrawContext context, float mouseX, float mouseY, float delta) {
-        GuiRoot root = features().get(Client.class).map(Client::getClickGui).orElseThrow().getRoot();
+        GuiRoot root = features().get(Settings.class).map(Settings::getClickGui).orElseThrow().getRoot();
 
         float left = contentX();
         float top = contentY();
@@ -102,7 +102,7 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
     }
 
     public float getExpandedHeight() {
-        GuiRoot root = features().get(Client.class).map(Client::getClickGui).orElseThrow().getRoot();
+        GuiRoot root = features().get(Settings.class).map(Settings::getClickGui).orElseThrow().getRoot();
         float height = 0;
         for (SettingComponent<?> comp : settingComponents) {
             height += comp.contentHeight() + root.btnGap * 0.5f;

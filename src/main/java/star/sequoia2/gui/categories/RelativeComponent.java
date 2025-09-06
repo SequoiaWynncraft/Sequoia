@@ -1,9 +1,9 @@
 package star.sequoia2.gui.categories;
 
 import star.sequoia2.accessors.FeaturesAccessor;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.component.InteractableComponent;
 import star.sequoia2.gui.screen.GuiRoot;
-import star.sequoia2.features.impl.Client;
 
 public abstract class RelativeComponent extends InteractableComponent implements FeaturesAccessor {
 
@@ -28,7 +28,7 @@ public abstract class RelativeComponent extends InteractableComponent implements
     public GuiRoot getGuiRoot() {
         GuiRoot root;
         try {
-            return features().get(Client.class).map(Client::getClickGui).orElseThrow().getRoot();
+            return features().get(Settings.class).map(Settings::getClickGui).orElseThrow().getRoot();
         } catch (Exception e) {
             return null;
         }

@@ -1,13 +1,12 @@
 package star.sequoia2.settings.types;
 
 import star.sequoia2.configuration.JsonCompound;
-import star.sequoia2.settings.CommandSupport;
 import star.sequoia2.settings.Setting;
 
 /**
  * Boolean setting
  */
-public class BooleanSetting extends Setting<Boolean> implements CommandSupport {
+public class BooleanSetting extends Setting<Boolean> {
     public BooleanSetting(int ordinal, String name, String description, Boolean defaultValue, Boolean value) {
         super(name, description, defaultValue, value, ordinal);
     }
