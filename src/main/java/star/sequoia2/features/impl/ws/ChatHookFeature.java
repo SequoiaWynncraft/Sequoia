@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class ChatHookFeature extends ToggleFeature implements GuildParserAccessor, TeXParserAccessor {
 
     public ChatHookFeature() {
-        super("ChatHook", "Chat related stuffs (type shi)");
+        super("ChatHook", "Chat related stuffs (type shi)", true);
     }
 
     private static final String GUILD_CHAT_PREFIX1 = "§b\uE006\uE002§b §b\uE060";

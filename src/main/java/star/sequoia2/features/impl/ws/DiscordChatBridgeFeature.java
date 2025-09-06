@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class DiscordChatBridgeFeature extends ToggleFeature {
 
     @Getter
-    BooleanSetting sendDiscordMessageToHook = settings().bool("sendtohook", "test", false);
+    BooleanSetting sendDiscordMessageToHook = settings().bool("sendtohook", "test", true);
 
     protected static final Pattern GUILD_CHAT_PATTERN = Pattern.compile(
             "^[\\s\\p{C}\\p{M}\\p{So}\\p{Sk}\\p{P}\\p{Z}\\p{S}\\p{L}\\p{N}§[0-9a-fk-or<]*]*?([^:]+):\\s*(.+)$",
@@ -23,7 +23,7 @@ public class DiscordChatBridgeFeature extends ToggleFeature {
              Pattern.compile("\uDB80\uDC00", Pattern.MULTILINE);
 
     public DiscordChatBridgeFeature() {
-        super("DiscordChatBridge", "forwards messages to discord");
+        super("DiscordChatBridge", "forwards messages to discord", true);
     }
 
     @Override

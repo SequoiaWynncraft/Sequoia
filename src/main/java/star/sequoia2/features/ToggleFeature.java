@@ -13,6 +13,8 @@ import lombok.Setter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.Optional;
+
 public abstract class ToggleFeature extends Feature implements SettingsAccessor, EventBusAccessor, NotificationsAccessor {
 
     private static final String ACTIVE = "active";
@@ -21,6 +23,11 @@ public abstract class ToggleFeature extends Feature implements SettingsAccessor,
     private boolean drawn = false;
 
     public final KeybindSetting keybind = settings().binding("Key", "Key to toggle this feature", Binding.none());
+
+    public ToggleFeature(String name, String description, boolean defaultActiveState) {
+        super(name, description);
+        this.active = defaultActiveState;
+    }
 
     public ToggleFeature(String name, String description) {
         super(name, description);
