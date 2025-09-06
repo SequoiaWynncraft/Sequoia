@@ -6,6 +6,7 @@ import com.collarmc.pounce.Subscribe;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
+import com.wynntils.utils.mc.McUtils;
 import lombok.Getter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -21,6 +22,9 @@ import star.sequoia2.events.MinecraftFinishedLoading;
 import star.sequoia2.features.Features;
 import star.sequoia2.features.impl.Settings;
 import star.sequoia2.features.impl.RenderTest;
+import star.sequoia2.features.impl.ws.ChatHookFeature;
+import star.sequoia2.features.impl.ws.DiscordChatBridgeFeature;
+import star.sequoia2.features.impl.ws.WebSocketFeature;
 import star.sequoia2.gui.Fonts;
 import star.sequoia2.gui.categories.Categories;
 import star.sequoia2.settings.SettingsState;
@@ -31,6 +35,7 @@ import star.sequoia2.utils.render.Render2DUtil;
 import star.sequoia2.utils.render.Render3DUtil;
 import star.sequoia2.utils.text.parser.TeXParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +44,14 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static String MOD_ID = "seq";
+
+    @Getter
+    public static File modJar;
+
+    private static File SEQUOIA_FOLDER;
+
+    @Getter
+    public static int versionInt = 30500;
 
     @Getter
     public static String version = "0.0.4.0";
@@ -100,6 +113,8 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
             throw new IllegalStateException("could not read configuration", e);
         }
 
+        SEQUOIA_FOLDER = new File(McUtils.mc().runDirectory, "sequoia");
+
         fonts = new Fonts();
 
         themes = new Themes();
@@ -143,6 +158,9 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private void registerFeatures() {
         features.add(new Settings()); // always first so you can get colors
         features.add(new RenderTest());
+        features.add(new ChatHookFeature());
+        features.add(new DiscordChatBridgeFeature());
+        features.add(new WebSocketFeature());
     }
 
     public static Supplier<Settings> clientModule = Suppliers
@@ -175,6 +193,10 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 //                        .styled(selectedTheme.dark()))
 //                .append(Text.empty()
 //                        .styled(selectedTheme.light())).append(text);
+    }
+
+    public static File getModStorageDir(String dirName) {
+        return new File(SEQUOIA_FOLDER, dirName);
     }
 
     public static void error(String message) {

@@ -547,7 +547,7 @@ public class GuildResponse implements TeXParserAccessor {
     public MutableText toPrettyMessage() {
         MutableText result = Text.empty();
 
-        result.append(parseMutableText(I18n.translate("sequoia.command.guildInfo.showGuildInfo",
+        result.append(teXParser().parseMutableText(I18n.translate("sequoia.command.guildInfo.showGuildInfo",
                 this.getName(), String.format("%06X", Models.Guild.getColor(this.getName()).asInt() & 0xFFFFFF),
                 this.getPrefix(), this.getLevel(), this.getLatestSeasonRating(), this.getOnline(),
                 this.getMembers().getTotal())));

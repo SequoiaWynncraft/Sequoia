@@ -796,6 +796,6 @@ public class PlayerResponse implements TeXParserAccessor {
                             I18n.translate("wynncraft.leaderboard." + type), position));
                 });
 
-        return parseMutableText(TeX.toString());
+        return teXParser().parseMutableText(TeX.toString());
     }
 }

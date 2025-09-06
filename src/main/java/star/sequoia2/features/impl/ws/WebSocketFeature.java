@@ -31,6 +31,8 @@ import static star.sequoia2.client.types.ws.WSConstants.GSON;
 
 public class WebSocketFeature extends ToggleFeature {
 
+    BooleanSetting autoReconnect = settings().bool("AutoReconnect", "Automatically reconnect when you disconnec", false);
+
     @Getter
     public BooleanSetting connectOnJoin = settings().bool("ConnectOnJoin", "Auto connect when joining", true);
 
@@ -298,7 +300,8 @@ public class WebSocketFeature extends ToggleFeature {
     }
 
     public void tryReconnect(boolean respectAutoReconnectPreference) {
-        if (respectAutoReconnectPreference && isActive() && !SeqClient.CONFIG.webSocketFeature.autoReconnect()) {
+
+        if (respectAutoReconnectPreference && isActive() && !autoReconnect.get()) {
             return;
         }
 

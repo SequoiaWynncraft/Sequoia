@@ -11,6 +11,7 @@ import star.sequoia2.features.impl.ws.DiscordChatBridgeFeature;
 import java.util.List;
 
 import static star.sequoia2.client.types.ws.WSConstants.GSON;
+import static star.sequoia2.utils.URLUtils.sanitize;
 
 public class SChannelMessageWSMessageHandler extends WSMessageHandler implements TeXParserAccessor, FeaturesAccessor {
     public SChannelMessageWSMessageHandler(String message) {
@@ -25,7 +26,7 @@ public class SChannelMessageWSMessageHandler extends WSMessageHandler implements
         // todo: add hover, add pillbox format, add message length limiter with more hover shenanigans
         SeqClient.debug(wsMessage.toString());
         if (features().getIfActive(DiscordChatBridgeFeature.class).map(DiscordChatBridgeFeature::isActive).orElse(false)
-                && features().getIfActive(DiscordChatBridgeFeature.class).map(DiscordChatBridgeFeature::getSendDiscordtyshi).orElse(false)) {
+                && features().getIfActive(DiscordChatBridgeFeature.class).map(discordChatBridgeFeature -> discordChatBridgeFeature.getSendDiscordMessageToHook().get()).orElse(false)) {
             SChannelMessageWSMessage sChannelMessageWSMessage = (SChannelMessageWSMessage) wsMessage;
             SChannelMessageWSMessage.Data sChannelMessageWSMessageData =
                     sChannelMessageWSMessage.getSChannelMessageData();

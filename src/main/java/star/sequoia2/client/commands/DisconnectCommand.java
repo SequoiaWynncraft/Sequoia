@@ -10,9 +10,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.SuggestionProviders;
+import star.sequoia2.features.impl.ws.WebSocketFeature;
 import star.sequoia2.utils.wynn.WynnUtils;
 
 import java.util.Objects;
@@ -21,7 +23,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static star.sequoia2.utils.AccessTokenManager.invalidateAccessToken;
 
-public class DisconnectCommand extends Command {
+public class DisconnectCommand extends Command implements FeaturesAccessor {
     @Override
     public String getCommandName() {
         return "disconnect";
@@ -62,7 +64,7 @@ public class DisconnectCommand extends Command {
     }
 
     private void sorter(CommandContext<FabricClientCommandSource> ctx) {
-        if (!SeqClient.getWebSocketFeature().isEnabled()) {
+        if (!features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) {
             ctx.getSource()
                     .sendError(
                             SeqClient.prefix(Text.translatable("sequoia.feature.webSocket.featureDisabled")));
@@ -77,8 +79,8 @@ public class DisconnectCommand extends Command {
                         return;
                     }
 
-                    if (SeqClient.getWebSocketFeature().getClient() == null
-                            || !SeqClient.getWebSocketFeature().getClient().isOpen()) {
+                    if (features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::getClient).orElse(null) == null
+                            || !features().getIfActive(WebSocketFeature.class).map(webSocketFeature -> webSocketFeature.getClient().isOpen()).orElse(false)) {
                         ctx.getSource()
                                 .sendError(SeqClient.prefix(Text.translatable("sequoia.command.disconnect.notConnected")));
                         return;
@@ -89,10 +91,10 @@ public class DisconnectCommand extends Command {
                                     SeqClient.prefix(Text.translatable("sequoia.command.disconnect.disconnecting"))
 
                             );
-                    SeqClient.getWebSocketFeature().closeIfNeeded();
+                    features().getIfActive(WebSocketFeature.class).ifPresent(WebSocketFeature::closeIfNeeded);
                     Managers.TickScheduler.scheduleLater(
                             () -> {
-                                if (SeqClient.getWebSocketFeature().getClient().isClosed()) {
+                                if (features().getIfActive(WebSocketFeature.class).map(webSocketFeature -> webSocketFeature.getClient().isClosed()).orElse(true)) {
                                     ctx.getSource()
                                             .sendFeedback(
                                                     SeqClient.prefix(

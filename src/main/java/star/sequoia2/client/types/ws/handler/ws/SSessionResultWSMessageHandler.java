@@ -1,9 +1,12 @@
 package star.sequoia2.client.types.ws.handler.ws;
 
 import org.apache.commons.lang3.StringUtils;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.ws.handler.WSMessageHandler;
 import star.sequoia2.client.types.ws.message.ws.SSessionResultWSMessage;
+import star.sequoia2.features.impl.ws.WebSocketFeature;
+import star.sequoia2.utils.AccessTokenManager;
 
 import java.util.regex.Pattern;
 
@@ -11,7 +14,7 @@ import static star.sequoia2.client.commands.DisconnectCommand.deleteToken;
 import static star.sequoia2.client.types.ws.WSConstants.GSON;
 
 
-public class SSessionResultWSMessageHandler extends WSMessageHandler {
+public class SSessionResultWSMessageHandler extends WSMessageHandler implements FeaturesAccessor {
     private static final Pattern JWT_PATTERN =
             Pattern.compile("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
 
@@ -39,15 +42,15 @@ public class SSessionResultWSMessageHandler extends WSMessageHandler {
         }
 
         if (StringUtils.equals(result, "Authentication pending.")) {
-            SeqClient.getWebSocketFeature().setAuthenticating(true);
-            SeqClient.getWebSocketFeature().setAuthenticated(false);
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticating(true));
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticated(false));
             SeqClient.debug("Authentication pending, waiting for successful authentication.");
             return;
         }
 
         if (StringUtils.equals(result, "Authenticated.")) {
-            SeqClient.getWebSocketFeature().setAuthenticating(false);
-            SeqClient.getWebSocketFeature().setAuthenticated(true);
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticating(false));
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticated(true));
             SeqClient.debug("Websocket authenticated!");
             return;
         }
@@ -59,8 +62,8 @@ public class SSessionResultWSMessageHandler extends WSMessageHandler {
 
         if (JWT_PATTERN.matcher(result).matches()) {
 
-            SeqClient.getWebSocketFeature().setAuthenticating(false);
-            SeqClient.getWebSocketFeature().setAuthenticated(true);
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticating(false));
+            features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.setAuthenticated(true));
             SeqClient.debug("Authenticated with WebSocket server.");
 
             if (!StringUtils.equals(AccessTokenManager.retrieveAccessToken(), result)) {

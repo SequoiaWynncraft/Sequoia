@@ -7,11 +7,13 @@ import com.wynntils.core.components.Models;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.services.wynn.guild.GuildResponse;
 import star.sequoia2.client.types.Services;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.command.suggestions.GuildSuggestionProvider;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.utils.cache.GuildCache;
 
 import java.util.List;
@@ -21,7 +23,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 @Deprecated
-public class OnlineMembersCommand extends Command {
+public class OnlineMembersCommand extends Command implements FeaturesAccessor {
     @Override
     public String getCommandName() {
         return "members";
@@ -76,14 +78,14 @@ public class OnlineMembersCommand extends Command {
     private void showGuild(CommandContext<FabricClientCommandSource> ctx, GuildResponse g) {
         ctx.getSource().sendFeedback(
                 SeqClient.prefix(
-                        Text.literal(g.getName()).styled(selectedTheme.accent1())
-                                .append(Text.literal(" [").styled(selectedTheme.light()))
+                        Text.literal(g.getName()).styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent1()).orElse(style -> style))
+                                .append(Text.literal(" [").styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style)))
                                 .append(Text.literal(g.getPrefix()).styled(s -> {return s.withColor(Models.Guild.getColor(g.getName()).asInt());}))
-                                .append(Text.literal("]: ").styled(selectedTheme.light()))
+                                .append(Text.literal("]: ").styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style)))
                                 .append(Text.literal(g.getOnline() + "/" + g.getMembers().getTotal() + " ")
-                                        .styled(selectedTheme.accent1()))
+                                        .styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().accent1()).orElse(style -> style)))
                                 .append(Text.translatable("sequoia.command.onlineMembers.showingGuildMembers")
-                                        .styled(selectedTheme.light()))
+                                        .styled(features().get(Settings.class).map(settings -> settings.getTheme().get().getTheme().light()).orElse(style -> style)))
                                 .append(Text.literal("\n"))
                                 .append(g.getOnline() > 0 ? g.getOnlineMembers().toPrettyMessage() : Text.empty())
                 )

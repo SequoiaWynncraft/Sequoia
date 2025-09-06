@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
+import star.sequoia2.client.SeqClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -50,9 +51,9 @@ public final class GuildCache  {
             List<String> prefixOnlyIds = new ArrayList<>(prefixToName.keySet());
             GuildCache.prefixOnlyIds = prefixOnlyIds;
 
-            Sequoia2.debug("Initialising guild cache");
+            SeqClient.debug("Initialising guild cache");
         } catch (Exception e) {
-            Sequoia2.error("Failed initialising guild cache", e);
+            SeqClient.error("Failed initialising guild cache", e);
         }
     }
 

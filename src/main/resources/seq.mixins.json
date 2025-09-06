@@ -12,15 +12,11 @@
     "requireAnnotations": true
   },
   "client": [
-    "ClientPlayNetworkHandlerMixin",
     "ChatHudMixin",
-    "ChatInputSuggestorMixin",
-    "ClientPlayNetworkHandlerMixin",
     "InGameHudMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
     "MouseMixin",
-    "ScreenMixin",
     "WorldRendererMixin"
   ]
 }

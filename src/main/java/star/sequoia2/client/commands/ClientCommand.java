@@ -9,13 +9,15 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import org.java_websocket.client.WebSocketClient;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.command.Command;
 import star.sequoia2.client.types.ws.message.ws.GClientCommandWSMessage;
+import star.sequoia2.features.impl.ws.WebSocketFeature;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class ClientCommand extends Command {
+public class ClientCommand extends Command implements FeaturesAccessor {
     @Override
     public String getCommandName() {
         return "seq";
@@ -44,13 +46,13 @@ public class ClientCommand extends Command {
     }
 
     private int sendClientCommand(CommandContext<FabricClientCommandSource> ctx, String cmd, String args) {
-        if (!SeqClient.getWebSocketFeature().isEnabled()) {
+        if (!features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) {
             ctx.getSource().sendError(
                     SeqClient.prefix(Text.translatable("sequoia.feature.webSocket.featureDisabled")));
             return 1;
         }
 
-        WebSocketClient ws = SeqClient.getWebSocketFeature().getClient();
+        WebSocketClient ws = features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::getClient).orElse(null);
         if (ws == null || !ws.isOpen()) {
             ctx.getSource().sendError(
                     SeqClient.prefix(Text.translatable("sequoia.command.ws.notConnected")));
@@ -61,7 +63,7 @@ public class ClientCommand extends Command {
         GClientCommandWSMessage.Data payload = new GClientCommandWSMessage.Data(cmd, args);
         GClientCommandWSMessage message = new GClientCommandWSMessage(payload);
 
-        SeqClient.getWebSocketFeature().sendMessage(message);
+        features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.sendMessage(message));
 
         return 1;
     }
