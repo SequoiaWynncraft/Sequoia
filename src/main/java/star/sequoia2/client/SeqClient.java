@@ -90,7 +90,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     }
 
     @Subscribe(value = Preference.MAIN, priority = 1)
-    public void onFinishedLoading(MinecraftFinishedLoading event) {
+    public void onFinishedLoading(MinecraftFinishedLoading ignored) {
         features = new Features();
         settings = new SettingsState();
 

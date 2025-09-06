@@ -1,55 +1,62 @@
 package star.sequoia2.utils;
 
-import star.sequoia2.client.SeqClient;
-
-import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Themes {
-    public enum Theme {
-        NOTHING,
-        RAINBOW,
-        FADE,
-        BRIGHT,
-    }
+    public enum ThemeEnum {
+        NEXUS(Themes.NexusTheme),
+        OLUX(Themes.OluxTheme),
+        MOLTEN(Themes.MoltenTheme),
+        SEAVALE(Themes.SeavaleTheme);
 
-    private Color cachedColor;
+        private Theme theme = NexusTheme;
 
-    private final Timer colorTimer = new Timer();
-
-    public Color getThemeColor(float colorOffset) {
-        return getThemeColor(colorOffset, 1, SeqClient.clientModule.get().themeControlEnumSetting.get());
-    }
-
-    public Color getThemeColor(float offset, float multiplier, Theme control) {
-        Color primary = new Color(SeqClient.clientModule.get().getPrimaryColor());
-        Color secondary = new Color(SeqClient.clientModule.get().getSecondaryColor());
-
-        if (colorTimer.passed(2500)) {
-            colorTimer.reset();
-            cachedColor = primary;
+        ThemeEnum(Theme theme) {
+            this.theme = theme;
         }
 
-        if (cachedColor == null || control == Theme.NOTHING) return primary;
-
-        offset *= 2;
-
-        final double timer = (System.currentTimeMillis() / 1E+8 * multiplier) * 4E+5;
-
-        switch (control) {
-            case FADE -> {
-                final double factor = (Math.sin(timer + offset * 0.55f) + 1) * 0.5f;
-                return Colors.mixColors(primary, secondary, factor);
-            }
-            case RAINBOW -> {
-                return new Color(Colors.getColor(-(1 + offset * 1.7f), 0.7f, 1));
-            }
-            case BRIGHT -> {
-                final float offset1 = (float) (Math.abs(Math.sin(timer + offset * 0.45)) / 2) + 1;
-                return Colors.brighter(primary, offset1);
-            }
-            default -> {
-                return cachedColor;
-            }
+        public Theme getTheme() {
+            return theme;
         }
     }
+
+    public static Map<String, Theme> ThemesMap = new HashMap<>();
+
+    public static Theme NexusTheme = new Theme(
+            "Nexus of Light",
+            0xf3e6ff,
+            0xa64dff,
+            0x6600cc,
+            0xffc34d,
+            0x66e0ff,
+            0xff3399
+    );
+    public static Theme OluxTheme = new Theme(
+            "Olux Swamp",
+            0x80dfff,
+            0x00e6ac,
+            0x267326,
+            0x73e600,
+            0xa366ff,
+            0xff3399
+    );
+    public static Theme MoltenTheme = new Theme(
+            "Molten Heights",
+            0xffedfc,
+            0xea3481,
+            0xa90f50,
+            0xffc34d,
+            0x66e0ff,
+            0xfa795f
+    );
+    public static Theme SeavaleTheme = new Theme(
+            "Seavale Reef",
+            0xedf9ff,
+            0xa0deff,
+            0x3945ff,
+            0x690ac8,
+            0xff35aa,
+            0x73e304
+    );
 }

@@ -63,7 +63,7 @@ public class ChangelogCategory extends RelativeComponent implements RenderUtilAc
         renderText(context, "Changelog:", x, y, Color.white().getColor(), true);
 
         y = y + 10;
-        for (int i = 0; i < 20; i++) { //todo update when more commits
+        for (int i = 0; i < commits.size(); i++) { //todo update when more commits
             context.enableScissor((int) left, (int) top, (int) (right), (int) (bottom));
             String commit_message =  commits.get(i);
             String author_message =  authors.get(i);
