@@ -15,6 +15,7 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "KeyboardMixin",
+    "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MouseMixin",
     "WorldRendererMixin"

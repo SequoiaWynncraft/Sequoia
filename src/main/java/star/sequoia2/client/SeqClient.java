@@ -20,6 +20,7 @@ import star.sequoia2.client.notifications.Notifications;
 import star.sequoia2.configuration.Configuration;
 import star.sequoia2.events.MinecraftFinishedLoading;
 import star.sequoia2.features.Features;
+import star.sequoia2.features.impl.PartyHealthDisplay;
 import star.sequoia2.features.impl.Settings;
 import star.sequoia2.features.impl.RenderTest;
 import star.sequoia2.features.impl.ws.ChatHookFeature;
@@ -35,6 +36,7 @@ import star.sequoia2.utils.render.Themes;
 import star.sequoia2.utils.render.Render2DUtil;
 import star.sequoia2.utils.render.Render3DUtil;
 import star.sequoia2.utils.text.parser.TeXParser;
+import star.sequoia2.utils.wynn.HadesUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,6 +122,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         Threading tInit = new Threading();
         Thread thread = new Thread(tInit);
         thread.start();
+        HadesUtils.init();
 
         fonts = new Fonts();
 
@@ -164,6 +167,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
     private void registerFeatures() {
         features.add(new Settings()); // always first so you can get colors
         features.add(new RenderTest());
+        features.add(new PartyHealthDisplay());
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
