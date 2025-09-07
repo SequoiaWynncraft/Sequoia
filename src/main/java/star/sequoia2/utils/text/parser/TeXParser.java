@@ -5,6 +5,7 @@ import com.wynntils.core.text.StyledText;
 import com.wynntils.core.text.StyledTextPart;
 import net.minecraft.text.*;
 import star.sequoia2.accessors.FeaturesAccessor;
+import star.sequoia2.accessors.TeXParserAccessor;
 import star.sequoia2.features.impl.Settings;
 
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TeXParser implements FeaturesAccessor {
+public class TeXParser implements FeaturesAccessor, TeXParserAccessor {
     // modified from mit 6.1010 lisp2 lab; "real world applications" can't believe this is the first place i use this
 
     private final Pattern TOKEN_PATTERN = Pattern.compile(
@@ -134,7 +135,8 @@ public class TeXParser implements FeaturesAccessor {
      */
 
     private final Map<String, BiFunction<List<String>, Integer, R>> texFunctions;
-    {
+
+    public TeXParser() {
         Map<String, BiFunction<List<String>, Integer, R>> m = new HashMap<>();
         m.put("\\gradient", this::gradient);       // \gradient{color1}{color2}{text}
         m.put("\\color", this::color);             // \color{n}{color}n{text}

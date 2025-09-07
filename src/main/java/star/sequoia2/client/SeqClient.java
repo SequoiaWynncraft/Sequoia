@@ -28,6 +28,7 @@ import star.sequoia2.features.impl.ws.WebSocketFeature;
 import star.sequoia2.gui.Fonts;
 import star.sequoia2.gui.categories.Categories;
 import star.sequoia2.settings.SettingsState;
+import star.sequoia2.utils.cache.Threading;
 import star.sequoia2.utils.chatparser.GuildMessageParser;
 import star.sequoia2.utils.chatparser.GuildRaidParser;
 import star.sequoia2.utils.render.Themes;
@@ -114,6 +115,11 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         }
 
         SEQUOIA_FOLDER = new File(McUtils.mc().runDirectory, "sequoia");
+
+        //Static init no need for instance in this case
+        Threading tInit = new Threading();
+        Thread thread = new Thread(tInit);
+        thread.start();
 
         fonts = new Fonts();
 

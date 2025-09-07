@@ -26,11 +26,11 @@ public class SChannelMessageWSMessageHandler extends WSMessageHandler implements
         // todo: add hover, add pillbox format, add message length limiter with more hover shenanigans
         SeqClient.debug(wsMessage.toString());
         if (features().getIfActive(DiscordChatBridgeFeature.class).map(DiscordChatBridgeFeature::isActive).orElse(false)
-                && features().getIfActive(DiscordChatBridgeFeature.class).map(discordChatBridgeFeature -> discordChatBridgeFeature.getSendDiscordMessageToHook().get()).orElse(false)) {
+                && features().getIfActive(DiscordChatBridgeFeature.class).map(discordChatBridgeFeature -> discordChatBridgeFeature.getSendDiscordMessageToChat().get()).orElse(false)) {
             SChannelMessageWSMessage sChannelMessageWSMessage = (SChannelMessageWSMessage) wsMessage;
             SChannelMessageWSMessage.Data sChannelMessageWSMessageData =
                     sChannelMessageWSMessage.getSChannelMessageData();
-            McUtils.sendMessageToClient(SeqClient.prefix(teXParser().parseMutableText(MESSAGE_FORMAT, formatColorArgs(sChannelMessageWSMessageData.color()), sanitize(sChannelMessageWSMessageData.displayName()), sanitize(sChannelMessageWSMessageData.message()))));
+            McUtils.sendMessageToClient(SeqClient.prefix(teXParser().parseMutableText(MESSAGE_FORMAT, formatColorArgs(sChannelMessageWSMessageData.color()), teXParser().sanitize(sChannelMessageWSMessageData.displayName()), teXParser().sanitize(sChannelMessageWSMessageData.message()))));
 //            String[] displayNameSplit =
 //                    sChannelMessageWSMessageData.displayName().split(" ");
 //            String playerName = displayNameSplit.length > 1 ? displayNameSplit[1] : displayNameSplit[0];

@@ -1,8 +1,6 @@
 package star.sequoia2.features.impl.ws;
 
 import lombok.Getter;
-import star.sequoia2.client.SeqClient;
-import star.sequoia2.features.Feature;
 import star.sequoia2.features.ToggleFeature;
 import star.sequoia2.settings.types.BooleanSetting;
 
@@ -12,7 +10,7 @@ import java.util.regex.Pattern;
 public class DiscordChatBridgeFeature extends ToggleFeature {
 
     @Getter
-    BooleanSetting sendDiscordMessageToHook = settings().bool("sendtohook", "test", true);
+    BooleanSetting sendDiscordMessageToChat = settings().bool("ShowDiscordInChat", "test", true);
 
     protected static final Pattern GUILD_CHAT_PATTERN = Pattern.compile(
             "^[\\s\\p{C}\\p{M}\\p{So}\\p{Sk}\\p{P}\\p{Z}\\p{S}\\p{L}\\p{N}§[0-9a-fk-or<]*]*?([^:]+):\\s*(.+)$",
