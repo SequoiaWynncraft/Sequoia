@@ -7,6 +7,4 @@ import org.jetbrains.annotations.Nullable;
 
 public interface IChatHud {
     void seq$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
-
-    void seq$remove(@Nullable MessageSignatureData signature);
 }

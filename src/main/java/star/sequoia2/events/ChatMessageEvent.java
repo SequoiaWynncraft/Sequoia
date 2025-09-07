@@ -5,5 +5,5 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 
-public record ChatMessageEvent(Text message, MessageSignatureData signature, MessageIndicator indicator) implements Cancelable {
+public record ChatMessageEvent(Text message) implements Cancelable {
 }
