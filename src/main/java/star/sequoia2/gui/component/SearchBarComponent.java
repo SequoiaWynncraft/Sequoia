@@ -57,21 +57,11 @@ public class SearchBarComponent extends RelativeComponent implements TextRendere
     }
 
     @Override
-    public void mouseMoved(float mouseX, float mouseY) {
-    }
-
-    @Override
     public void mouseClicked(float mouseX, float mouseY, int button) {
         if (isWithinContent(mouseX, mouseY)) {
             searching = true;
         }
     }
-
-    @Override
-    public void mouseReleased(float mouseX, float mouseY, int button) {}
-
-    @Override
-    public void mouseScrolled(float mouseX, float mouseY, double horizontalAmount, double verticalAmount) {}
 
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -95,9 +85,6 @@ public class SearchBarComponent extends RelativeComponent implements TextRendere
             }
         }
     }
-
-    @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {}
 
     @Override
     public void charTyped(char chr, int modifiers) {

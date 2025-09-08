@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minidev.json.JSONObject;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.component.SearchBarComponent;
 import star.sequoia2.http.Http;
@@ -48,20 +49,28 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
         float bottom = top + contentHeight();
         MatrixStack matrices = context.getMatrices();
 
-        // child
+        Color normal = features().get(Settings.class).map(Settings::getThemeNormal).orElse(Color.black());
+        Color dark = features().get(Settings.class).map(Settings::getThemeDark).orElse(Color.black());
+        Color light = features().get(Settings.class).map(Settings::getThemeLight).orElse(Color.black());
+        Color accent1 = features().get(Settings.class).map(Settings::getThemeAccent1).orElse(Color.black());
+        Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
+        Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
+
         searchBarComponent.render(context, mouseX, mouseY, delta);
         searchBarComponent.setPos(left, top);
         searchBarComponent.setDimensions(contentWidth() - 25f, getGuiRoot().btnH);
 
-        render2DUtil().roundRectFilled(context.getMatrices(), right - 25f, top, right, top + getGuiRoot().btnH, getGuiRoot().rounding, isWithin(mouseX, mouseY, right - 25f, top, 25, getGuiRoot().btnH) ? new Color(50, 50, 50) : new Color(35, 35, 35));
+        boolean hoverEnter = isWithin(mouseX, mouseY, right - 25f, top, 25, getGuiRoot().btnH);
+        Color enterStart = hoverEnter ? light : normal;
+        render2DUtil().roundRectFilled(context.getMatrices(), right - 25f, top, right, top + getGuiRoot().btnH, getGuiRoot().rounding, enterStart);
 
         matrices.push();
         matrices.translate(right - 25f, top, 0);
-        context.drawTexture(RenderLayer::getGuiTextured, TextureStorage.enter, 0, 0, 0, 0, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH, isWithin(mouseX, mouseY, right - 25f, top, 25, getGuiRoot().btnH) ? new java.awt.Color(20, 20, 20).getRGB() : new java.awt.Color(60, 60, 60).getRGB());
+        context.drawTexture(RenderLayer::getGuiTextured, TextureStorage.enter, 0, 0, 0, 0, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH, (int) getGuiRoot().btnH,
+                hoverEnter ? new java.awt.Color(dark.getRed(), dark.getGreen(), dark.getBlue(), dark.getAlpha()).getRGB() : new java.awt.Color(light.getRed(), light.getGreen(), light.getBlue(), light.getAlpha()).getRGB());
         matrices.pop();
 
         if (currentStats != null) {
-            // pull the fields safely
             String username = jStr(currentStats, "username");
             boolean online = jBool(currentStats, "online");
             String server = jStr(currentStats, "server");
@@ -72,47 +81,44 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
             String guildName = guildObj != null ? jStr(guildObj, "name") : null;
             String guildRank = guildObj != null ? jStr(guildObj, "rank") : null;
 
-            // globalData.raids.list -> map of raid name -> total completions
             JSONObject raidsList = jObj(jObj(jObj(currentStats, "globalData"), "raids"), "list");
 
             int warsComplete = jInt(jObj(currentStats, "globalData"), "wars");
 
             int totalLevel = jInt(jObj(currentStats, "globalData"), "totalLevel");
 
-            // layout
             float x = left;
             float y = top + getGuiRoot().btnH + 6f;
             float line = textRenderer().fontHeight + 4f;
 
-            // title
-            render2DUtil().drawText(context, (username != null ? username : "(unknown)") + (online ? "  • ONLINE" : "  • offline"), x, y, 0xFFFFFFFF, true);
+            render2DUtil().drawText(context, (username != null ? username : "(unknown)") + (online ? "  • ONLINE" : "  • offline"), x, y, light.getColor(), true);
             y += line;
 
-            render2DUtil().drawText(context, "Total playtime: " + String.format("%.1f hrs", playtime), x, y, 0xFFAAAAAA, true);
+            render2DUtil().drawText(context, "Total playtime: " + String.format("%.1f hrs", playtime), x, y, light.getColor(), true);
             y += line;
 
-            render2DUtil().drawText(context, "Total level: " + totalLevel, x, y, 0xFFAAAAAA, true);
+            render2DUtil().drawText(context, "Total level: " + totalLevel, x, y, light.getColor(), true);
             y += line;
 
-            render2DUtil().drawText(context, (guildName != null) ? guildRank + " of " + guildName + " guild." : "Not in a guild", x, y, 0xFFAAAAAA, true);
+            render2DUtil().drawText(context, (guildName != null) ? guildRank + " of " + guildName + " guild." : "Not in a guild", x, y, light.getColor(), true);
             y += line;
 
-            render2DUtil().drawText(context, "Wars: " + warsComplete, x, y, 0xFFAAAAAA, true);
+            render2DUtil().drawText(context, "Wars: " + warsComplete, x, y, light.getColor(), true);
             y += line;
 
             if (online) {
-                render2DUtil().drawText(context, "Server: " + (server != null ? server : "-"), x, y, 0xFFCCCCCC, true);
+                render2DUtil().drawText(context, "Server: " + (server != null ? server : "-"), x, y, light.getColor(), true);
                 y += line;
             } else {
-                render2DUtil().drawText(context, "Last known server: " + (server != null ? server : "-"), x, y, 0xFFCCCCCC, true);
+                render2DUtil().drawText(context, "Last known server: " + (server != null ? server : "-"), x, y, light.getColor(), true);
                 y += line;
             }
 
-            render2DUtil().drawText(context, "Raid completions (total across all characters):", x, y, 0xFF87CEFA, true);
+            render2DUtil().drawText(context, "Raid completions (total across all characters):", x, y, accent2.getColor(), true);
             y += line;
 
             if (raidsList == null || raidsList.isEmpty()) {
-                render2DUtil().drawText(context, "No raids found.", x, y, 0xFFCCCCCC, true);
+                render2DUtil().drawText(context, "No raids found.", x, y, light.getColor(), true);
                 y += line;
             } else {
                 List<Map.Entry<String, Object>> entries = new ArrayList<>(raidsList.entrySet());
@@ -125,15 +131,14 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
 
                     if (y + line > bottom - 4) break;
 
-                    render2DUtil().drawText(context, raidName + ": " + clears, x, y, 0xFFFFFFFF, true);
+                    render2DUtil().drawText(context, raidName + ": " + clears, x, y, light.getColor(), true);
                     y += line;
                 }
             }
         } else {
-            render2DUtil().drawText(context, "§8Search to see stats", left + ((contentWidth()) / 2) - (textRenderer().getWidth("Search to see stats") / 2f), top + (contentHeight() / 2), Color.white().getColor(), true);
+            render2DUtil().drawText(context, "§8Search to see stats", left + ((contentWidth()) / 2) - (textRenderer().getWidth("Search to see stats") / 2f), top + (contentHeight() / 2), light.getColor(), true);
         }
 
-        //skin preview
         if (previewPlayer != null) {
             int pad = 6;
             int boxHeight = (int) 100f;
@@ -146,23 +151,17 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
             previewPlayer.bodyYaw += delta * 10f;
             previewPlayer.headYaw = previewPlayer.bodyYaw;
 
-
-            render2DUtil().roundRectFilled(context.getMatrices(), x1 - 1, y1 - 1, x2 + 1, y2 + 1, getGuiRoot().rounding, new Color(20, 20, 20));
+            render2DUtil().roundGradientFilled(context.getMatrices(), x1 - 1, y1 - 1, x2 + 1, y2 + 1, getGuiRoot().rounding, dark, normal, true);
 
             InventoryScreen.drawEntity(
                     context,
                     x1, y1, x2, y2,
                     boxWidth - 10,
-                    0.0625f, // from mojang inv magic number
+                    0.0625f,
                     mouseX, mouseY,
                     previewPlayer
             );
         }
-    }
-
-    @Override
-    public void mouseMoved(float mouseX, float mouseY) {
-
     }
 
     @Override
@@ -187,16 +186,6 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
     }
 
     @Override
-    public void mouseReleased(float mouseX, float mouseY, int button) {
-
-    }
-
-    @Override
-    public void mouseScrolled(float mouseX, float mouseY, double horizontalAmount, double verticalAmount) {
-
-    }
-
-    @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         searchBarComponent.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == GLFW.GLFW_KEY_ENTER && searchBarComponent.isSearching()) {
@@ -212,10 +201,6 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
             searchBarComponent.setSearching(false);
             searchBarComponent.setSearch("");
         }
-    }
-
-    @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
     }
 
     @Override

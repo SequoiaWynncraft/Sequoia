@@ -1,7 +1,6 @@
 package star.sequoia2.mixin;
 
 import com.wynntils.services.hades.HadesUser;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -15,7 +14,6 @@ import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -85,7 +83,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
             Matrix4f model = matrixStack.peek().getPositionMatrix();
 
             RenderLayer renderLayer;
-            renderLayer = RenderLayer.getText(TextureStorage.BARS);
+            renderLayer = RenderLayer.getText(TextureStorage.bars);
 
             VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
 

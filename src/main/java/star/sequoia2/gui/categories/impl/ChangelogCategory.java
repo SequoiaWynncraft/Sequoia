@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.TextRendererAccessor;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.screen.GuiRoot;
 import mil.nga.color.Color;
@@ -29,6 +30,13 @@ public class ChangelogCategory extends RelativeComponent implements RenderUtilAc
 
         GuiRoot root = getGuiRoot();
 
+        Color normal = features().get(Settings.class).map(Settings::getThemeNormal).orElse(Color.black());
+        Color dark = features().get(Settings.class).map(Settings::getThemeDark).orElse(Color.black());
+        Color light = features().get(Settings.class).map(Settings::getThemeLight).orElse(Color.black());
+        Color accent1 = features().get(Settings.class).map(Settings::getThemeAccent1).orElse(Color.black());
+        Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
+        Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
+
         String commitsStr = FabricLoader.getInstance().getModContainer("seq")
                 .map(c -> c.getMetadata().getCustomValue("commit_list").getAsString())
                 .orElse("");
@@ -49,66 +57,29 @@ public class ChangelogCategory extends RelativeComponent implements RenderUtilAc
 
         List<String> date = commitDate.isEmpty() ? List.of() : List.of(commitDate.split("\\R"));
 
-        render2DUtil().roundRectFilled(context.getMatrices(), left, top, right, bottom, 8, new Color(50, 50, 50));
+        render2DUtil().roundGradientFilled(context.getMatrices(), left, top, right, bottom, 8, normal, dark, true);
 
         float x = left + root.pad;
         float y = top + root.pad + 5;
 
-        renderText(context, "§9seq §f+ " + commitHash, x, y, Color.white().getColor(), true);
+        renderText(context, "seq §f+ " + commitHash, x, y, accent1.getColor(), true);
         y = y + textRenderer().fontHeight;
-        renderText(context, "§8" + date.getFirst(), x, y, Color.white().getColor(), true);
+        if (!date.isEmpty()) {
+            renderText(context, "§8" + date.getFirst(), x, y, light.getColor(), true);
+        }
 
         y = y + 15;
 
-        renderText(context, "Changelog:", x, y, Color.white().getColor(), true);
+        renderText(context, "Changelog:", x, y, accent2.getColor(), true);
 
         y = y + 10;
-        for (int i = 0; i < commits.size(); i++) { //todo update when more commits
+        for (int i = 0; i < commits.size(); i++) {
             context.enableScissor((int) left, (int) top, (int) (right), (int) (bottom));
-            String commit_message =  commits.get(i);
-            String author_message =  authors.get(i);
-            renderText(context, "*" + commit_message + "§3 -" + author_message, x, y, Color.white().getColor(), true);
+            String commit_message = commits.get(i);
+            String author_message = authors.size() > i ? authors.get(i) : "";
+            renderText(context, "*" + commit_message + "§3 -" + author_message, x, y, light.getColor(), true);
             y += textRenderer().fontHeight + root.btnGap;
             context.disableScissor();
         }
-
-
-        float mx = localMouseX(mouseX);
-        float my = localMouseY(mouseY);
-    }
-
-    @Override
-    public void mouseMoved(float mouseX, float mouseY) {
-
-    }
-
-    @Override
-    public void mouseClicked(float mouseX, float mouseY, int button) {
-
-    }
-
-    @Override
-    public void mouseReleased(float mouseX, float mouseY, int button) {
-
-    }
-
-    @Override
-    public void mouseScrolled(float mouseX, float mouseY, double horizontalAmount, double verticalAmount) {
-
-    }
-
-    @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-
-    }
-
-    @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-
-    }
-
-    @Override
-    public void charTyped(char chr, int modifiers) {
-
     }
 }

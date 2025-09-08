@@ -38,12 +38,32 @@ public class Settings extends Feature {
         return volume.get();
     }
 
-    public int getPrimaryColor() {
+    public int getNormalColorInt() {
         return theme.get().getTheme().NORMAL;
     }
 
-    public int getSecondaryColor() {
-        return theme.get().getTheme().DARK;
+    public Color getThemeNormal() {
+        return new Color(theme.get().getTheme().NORMAL);
+    }
+
+    public Color getThemeDark() {
+        return new Color(theme.get().getTheme().DARK);
+    }
+
+    public Color getThemeLight() {
+        return new Color(theme.get().getTheme().LIGHT);
+    }
+
+    public Color getThemeAccent1() {
+        return new Color(theme.get().getTheme().ACCENT1);
+    }
+
+    public Color getThemeAccent2() {
+        return new Color(theme.get().getTheme().ACCENT2);
+    }
+
+    public Color getThemeAccent3() {
+        return new Color(theme.get().getTheme().ACCENT3);
     }
 
     @Subscribe
@@ -57,11 +77,5 @@ public class Settings extends Feature {
 
     public Color colorWithAlpha(Color color, float alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-    }
-
-    public static float[] convertToHSB(ColorSetting color) {
-        Color value = color.get();
-        float[] hsbVals = java.awt.Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
-        return new float[] { hsbVals[0], hsbVals[1], hsbVals[2],  value.getAlpha() / 255.0f };
     }
 }

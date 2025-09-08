@@ -42,7 +42,7 @@ public class Notifications implements FeaturesAccessor {
     public void sendMessage(Text message, String sig) {
         if (notReady()) return;
 
-        int color = feature(Settings.class).getPrimaryColor();
+        int color = feature(Settings.class).getNormalColorInt();
         MutableText prefix = Text.literal("[Seq] ").withColor(color);
         if (message.getStyle().getColor() == null) {
             prefix.append(MutableText.of(message.getContent()).formatted(Formatting.WHITE));

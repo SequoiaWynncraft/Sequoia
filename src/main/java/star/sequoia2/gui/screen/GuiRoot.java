@@ -1,9 +1,12 @@
 package star.sequoia2.gui.screen;
 
+import lombok.Getter;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
+import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.TextRendererAccessor;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import mil.nga.color.Color;
 import net.minecraft.client.gui.DrawContext;
@@ -11,9 +14,11 @@ import star.sequoia2.utils.render.TextureStorage;
 
 import java.util.List;
 
-public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor {
+public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, FeaturesAccessor {
 
+    @Getter
     private final List<RelativeComponent> categories;
+    @Getter
     private int selected = 0;
 
     private float uiW, uiH;
@@ -52,13 +57,18 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor {
         float bx = (uiW - boxWidth) / 2f;
         float by = (uiH - boxHeight) / 2f;
 
-        // main background box (centered)
-        render2DUtil().roundRectFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, new Color(30, 30, 30));
+        Color normal = features().get(Settings.class).map(Settings::getThemeNormal).orElse(Color.black());
+        Color dark = features().get(Settings.class).map(Settings::getThemeDark).orElse(Color.black());
+        Color light = features().get(Settings.class).map(Settings::getThemeLight).orElse(Color.black());
+        Color accent1 = features().get(Settings.class).map(Settings::getThemeAccent1).orElse(Color.black());
+        Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
+        Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
 
-        //category box area border.
+        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, normal, dark, true);
+
         matrices.push();
         render2DUtil().enableScissor((int) bx, (int) by, (int) (bx + btnW + pad * 2), (int) (by + boxHeight));
-        render2DUtil().roundRectFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, new Color(20, 20, 20));
+        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, normal, true);
         render2DUtil().disableScissor();
         matrices.pop();
 
@@ -67,7 +77,6 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor {
         context.drawTexture(RenderLayer::getGuiTextured , TextureStorage.icon, 0, 0, 0, 0, (int) btnW, (int) btnW, (int) btnW, (int) btnW);
         matrices.pop();
 
-        // sidebar buttons
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;
 
@@ -75,31 +84,39 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor {
             RelativeComponent c = categories.get(i);
             float byTop = listY + i * (btnH + btnGap);
             boolean hover = mouseX >= listX && mouseX <= listX + btnW && mouseY >= byTop && mouseY <= byTop + btnH;
-            Color bg = (i == selected) ? new Color(30, 50, 150) : hover ? new Color(30, 30, 30) : new Color(35, 35, 35, 10);
 
-            render2DUtil().roundRectFilled(matrices, listX, byTop, listX + btnW, byTop + btnH, rounding, bg);
+            Color start, end;
+            if (i == selected) {
+                start = accent1;
+                end = accent2;
+            } else if (hover) {
+                start = light;
+                end = normal;
+            } else {
+                start = dark;
+                end = dark;
+            }
+
+            render2DUtil().roundGradientFilled(matrices, listX, byTop, listX + btnW, byTop + btnH, rounding, start, end, true);
 
             int textWidth = textRenderer().getWidth(c.name);
             float textX = listX + (btnW - textWidth) / 2f;
             float textY = byTop + (btnH - textRenderer().fontHeight) / 2f;
 
-            // Pick a glow color (same as your selected blue, or any accent)
-            Color glowColor = new Color(40, 40, 100, 50);
+            Color glowColor = accent2;
 
             if (i == selected) {
                 render2DUtil().drawGlow(context, listX, byTop, listX + btnW, byTop + btnH, glowColor, rounding);
             }
 
-            context.drawText(textRenderer(), c.name, (int) textX, (int) textY, Color.white().getColor(), true);
+            context.drawText(textRenderer(), c.name, (int) textX, (int) textY, light.getColor(), true);
         }
 
-        // content area
         float contentX = bx + pad + btnW + pad * 2;
         float contentY = by + pad;
         float contentW = boxWidth - (contentX - bx) - pad;
         float contentH = boxHeight - pad * 2f;
 
-        // render current category inside the content area
         if (!categories.isEmpty()) {
             RelativeComponent current = categories.get(selected);
             current.setPos(contentX, contentY);

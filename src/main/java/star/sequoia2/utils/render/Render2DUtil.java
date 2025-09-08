@@ -129,7 +129,7 @@ public class Render2DUtil implements TextRendererAccessor {
     }
 
     public void roundRectFilled(MatrixStack matrices, float x, float y, float x2, float y2, float radius, Color color) {
-        renderRoundedQuad(matrices, color, x, y, x2, y2, radius, 4);
+        renderRoundedQuad(matrices, x, y, x2, y2, radius, color, 4);
     }
 
     public void setupRender() {
@@ -192,7 +192,7 @@ public class Render2DUtil implements TextRendererAccessor {
         RenderSystem.disableBlend();
     }
 
-    public void renderRoundedQuad(MatrixStack matrices, Color c, double x, double y, double x2, double y2, double radius, double samples) {
+    public void renderRoundedQuad(MatrixStack matrices, double x, double y, double x2, double y2, double radius, Color c, double samples) {
         setupRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         renderRoundedQuadInternal(matrices, c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f, x, y, x2, y2, radius, samples);
@@ -323,27 +323,20 @@ public class Render2DUtil implements TextRendererAccessor {
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
-    private void drawGradientQuad(MatrixStack matrices, int x, int x2, int y, int y2, int z, float u0, float u1, float v0, float v1, float red, float green, float blue, float alpha) {
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        RenderSystem.enableBlend();
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        Matrix4f m = matrices.peek().getPositionMatrix();
-        buffer.vertex(m, (float) x,  (float) y,  (float) z).color(red, green, blue, alpha).texture(u0, v0);
-        buffer.vertex(m, (float) x,  (float) y2, (float) z).color(red, green, blue, alpha).texture(u0, v1);
-        buffer.vertex(m, (float) x2, (float) y2, (float) z).color(red, green, blue, alpha).texture(u1, v1);
-        buffer.vertex(m, (float) x2, (float) y,  (float) z).color(red, green, blue, alpha).texture(u1, v0);
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        RenderSystem.disableBlend();
+    public void roundGradientFilled(MatrixStack matrixStack, float x, float y, float x2, float y2, float radius, Color startColor, Color endColor, boolean sideways) {
+        renderRoundedGradientQuad(matrixStack, x, y, x2, y2, radius, 5,
+                new java.awt.Color(startColor.getRed(), startColor.getGreen(), startColor.getBlue(), startColor.getAlpha()).getRGB(),
+                new java.awt.Color(endColor.getRed(), endColor.getGreen(), endColor.getBlue(), endColor.getAlpha()).getRGB(), sideways);
     }
 
     public void renderRoundedGradientQuad(MatrixStack matrices,
-                                          double x, double y, double x2, double y2,
-                                          double radius, double samples,
+                                          float x, float y, float x2, float y2,
+                                          float radius, float samples,
                                           int startColor, int endColor,
                                           boolean sideways) {
-        double w = Math.max(0.0, x2 - x);
-        double h = Math.max(0.0, y2 - y);
-        radius = Math.max(0.0, Math.min(radius, Math.min(w, h) * 0.5));
+        float w = Math.max(0.0f, x2 - x);
+        float h = Math.max(0.0f, y2 - y);
+        radius = Math.max(0.0f, Math.min(radius, Math.min(w, h) * 0.5f));
         setupRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         Matrix4f m = matrices.peek().getPositionMatrix();
