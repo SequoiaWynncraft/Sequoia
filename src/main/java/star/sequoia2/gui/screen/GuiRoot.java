@@ -64,11 +64,11 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
         Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
 
-        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, normal, dark, true);
+        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, dark, false);
 
         matrices.push();
         render2DUtil().enableScissor((int) bx, (int) by, (int) (bx + btnW + pad * 2), (int) (by + boxHeight));
-        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, normal, true);
+        render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, normal, false);
         render2DUtil().disableScissor();
         matrices.pop();
 

@@ -21,11 +21,18 @@ public class Settings extends Feature {
     public final KeybindSetting menuKeybind = settings().binding("GuiKey:", "Opens the ClickGui", Binding.withKey(GLFW.GLFW_KEY_O));
 
     @Getter
-    public EnumSetting<Themes.ThemeEnum> theme = settings().options("Theme", "Theme Setting", Themes.ThemeEnum.NEXUS, Themes.ThemeEnum.class);
+    public EnumSetting<Themes.ThemeEnum> theme = settings().options("ChatTheme", "ChatTheme Setting", Themes.ThemeEnum.NEXUS, Themes.ThemeEnum.class);
 
     public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Arial", () -> SeqClient.getFonts().fonts());
 
     IntSetting volume = settings().number("Volume", "Volume of UI sounds.", 100, 0, 100);
+
+    ColorSetting colorNormal = settings().color("Normal", "Normal color", new Color(52, 32, 255));
+    ColorSetting colorDark = settings().color("Dark", "Dark color", new Color(52, 255, 32));
+    ColorSetting colorLight = settings().color("Light", "Light color", new Color(52, 32, 36));
+    ColorSetting colorAccent1 = settings().color("Accent1", "Accent1 color", new Color(52, 32, 255));
+    ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(255, 32, 255));
+    ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(52, 32, 52));
 
     @Getter
     public ClickGUIScreen clickGui;
@@ -43,27 +50,27 @@ public class Settings extends Feature {
     }
 
     public Color getThemeNormal() {
-        return new Color(theme.get().getTheme().NORMAL);
+        return colorNormal.get();
     }
 
     public Color getThemeDark() {
-        return new Color(theme.get().getTheme().DARK);
+        return colorDark.get();
     }
 
     public Color getThemeLight() {
-        return new Color(theme.get().getTheme().LIGHT);
+        return colorLight.get();
     }
 
     public Color getThemeAccent1() {
-        return new Color(theme.get().getTheme().ACCENT1);
+        return colorAccent1.get();
     }
 
     public Color getThemeAccent2() {
-        return new Color(theme.get().getTheme().ACCENT2);
+        return colorAccent2.get();
     }
 
     public Color getThemeAccent3() {
-        return new Color(theme.get().getTheme().ACCENT3);
+        return colorAccent3.get();
     }
 
     @Subscribe
@@ -75,7 +82,9 @@ public class Settings extends Feature {
         }
     }
 
-    public Color colorWithAlpha(Color color, float alpha) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    public static float[] convertToHSB(ColorSetting color) {
+        Color value = color.get();
+        float[] hsbVals = java.awt.Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
+        return new float[] { hsbVals[0], hsbVals[1], hsbVals[2],  value.getAlpha() / 255.0f };
     }
 }

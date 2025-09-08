@@ -92,14 +92,10 @@ public class FeaturesCategory extends RelativeComponent implements RenderUtilAcc
             if (searchBarComponent.isSearching() && !button.name.toLowerCase().contains(searchBarComponent.getSearch().toLowerCase())) continue;
             float itemH = root.btnH * 2;
             float y = viewportY + drawOffset - scrollOffset + root.btnGap;
-            if (y + itemH >= viewportY - 30 && y <= viewportY + viewportH + 30) {
-                button.setPos(left, y);
-                button.setDimensions(viewportW, itemH);
-                button.render(context, mouseX, mouseY, delta);
-            } else {
-                button.setPos(left, y);
-                button.setDimensions(viewportW, itemH);
-            }
+            button.setPos(left, y);
+            button.setDimensions(viewportW, itemH);
+            button.render(context, mouseX, mouseY, delta);
+
             drawOffset += itemH + root.btnGap;
             if (button.isOpen()) {
                 float eh = button.getExpandedHeight();

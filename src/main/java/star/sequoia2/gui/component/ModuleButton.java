@@ -7,9 +7,7 @@ import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.SettingsAccessor;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.component.settings.SettingComponent;
-import star.sequoia2.gui.component.settings.impl.BooleanSettingComponent;
-import star.sequoia2.gui.component.settings.impl.EnumSettingComponent;
-import star.sequoia2.gui.component.settings.impl.KeybindSettingComponent;
+import star.sequoia2.gui.component.settings.impl.*;
 import star.sequoia2.gui.screen.GuiRoot;
 import star.sequoia2.features.Feature;
 import star.sequoia2.features.ToggleFeature;
@@ -18,9 +16,7 @@ import star.sequoia2.settings.Setting;
 import lombok.Getter;
 import mil.nga.color.Color;
 import net.minecraft.client.gui.DrawContext;
-import star.sequoia2.settings.types.BooleanSetting;
-import star.sequoia2.settings.types.EnumSetting;
-import star.sequoia2.settings.types.KeybindSetting;
+import star.sequoia2.settings.types.*;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
@@ -58,6 +54,10 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
             components.add(new BooleanSettingComponent(booleanSetting));
         } else if (setting instanceof EnumSetting enumSetting) {
             components.add(new EnumSettingComponent(enumSetting));
+        } else if (setting instanceof CalculatedEnumSetting calculatedEnumSetting) {
+            components.add(new CalculatedEnumSettingComponent(calculatedEnumSetting));
+        } else if(setting instanceof ColorSetting colorSetting) {
+            components.add(new ColorSettingComponent(colorSetting));
         }
     }
 
@@ -79,7 +79,7 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
         Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
 
         Color bgEnd = hovering ? bgStart : dark;
-        render2DUtil().roundGradientFilled(context.getMatrices(), left, top, right, bottom, root.rounding, bgStart, bgEnd, true);
+        render2DUtil().roundGradientFilled(context.getMatrices(), left, top, right, bottom, root.rounding, bgEnd, accent1, true);
 
         context.getMatrices().push();
         context.getMatrices().translate(left + root.pad, top + textRenderer().fontHeight, 0);
@@ -106,6 +106,9 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
                 settingComp.setPos(left + root.pad, top + offsetY);
                 settingComp.setDimensions(contentWidth() - root.pad * 2f, root.btnH * 0.8f);
                 settingComp.render(context, mouseX, mouseY, delta);
+                if (settingComp instanceof ColorSettingComponent colorSettingComponent && colorSettingComponent.isOpen()) {
+                    settingComp.setDimensions(contentWidth() - root.pad * 2f, root.btnH * 0.8f + colorSettingComponent.getPickerHeight());
+                }
                 offsetY += settingComp.contentHeight() + root.btnGap * 0.5f;
             }
         }
