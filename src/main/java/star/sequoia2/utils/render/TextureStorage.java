@@ -7,5 +7,5 @@ public final class TextureStorage {
     public static Identifier enter = Identifier.of("seq", "textures/enter.png");
     public static Identifier icon = Identifier.of("seq", "icon.png");
     public static Identifier icon_dark = Identifier.of("seq", "icondark.png");
-    public static Identifier bars = Identifier.of("sequoia2", "textures/player_info_bars.png");
+    public static Identifier bars = Identifier.of("seq", "textures/player_info_bars.png");
 }
