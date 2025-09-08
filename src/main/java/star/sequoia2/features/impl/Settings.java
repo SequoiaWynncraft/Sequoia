@@ -27,12 +27,12 @@ public class Settings extends Feature {
 
     IntSetting volume = settings().number("Volume", "Volume of UI sounds.", 100, 0, 100);
 
-    ColorSetting colorNormal = settings().color("Normal", "Normal color", new Color(52, 32, 255));
-    ColorSetting colorDark = settings().color("Dark", "Dark color", new Color(52, 255, 32));
-    ColorSetting colorLight = settings().color("Light", "Light color", new Color(52, 32, 36));
-    ColorSetting colorAccent1 = settings().color("Accent1", "Accent1 color", new Color(52, 32, 255));
-    ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(255, 32, 255));
-    ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(52, 32, 52));
+    ColorSetting colorNormal = settings().color("Normal", "Normal color", new Color(39473836));
+    ColorSetting colorDark = settings().color("Dark", "Dark color", new Color(-14012845));
+    ColorSetting colorLight = settings().color("Light", "Light color", new Color(-66308));
+    ColorSetting colorAccent1 = settings().color("Accent1", "Accent1 color", new Color(-12041351));
+    ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(-12615215));
+    ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(-12615215));
 
     @Getter
     public ClickGUIScreen clickGui;
