@@ -14,6 +14,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
+import star.sequoia2.Seq;
 import star.sequoia2.accessors.EventBusAccessor;
 import star.sequoia2.client.commands.Commands;
 import star.sequoia2.client.notifications.Notifications;
@@ -172,7 +173,9 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
-        features.add(new CustomChat());
+        if (Seq.isHasMCEF()) {
+            features.add(new CustomChat());
+        }
     }
 
     public static Supplier<Settings> clientModule = Suppliers
