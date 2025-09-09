@@ -20,6 +20,7 @@ import star.sequoia2.client.notifications.Notifications;
 import star.sequoia2.configuration.Configuration;
 import star.sequoia2.events.MinecraftFinishedLoading;
 import star.sequoia2.features.Features;
+import star.sequoia2.features.impl.CustomChat;
 import star.sequoia2.features.impl.PartyHealthDisplay;
 import star.sequoia2.features.impl.Settings;
 import star.sequoia2.features.impl.RenderTest;
@@ -171,6 +172,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
+        features.add(new CustomChat());
     }
 
     public static Supplier<Settings> clientModule = Suppliers

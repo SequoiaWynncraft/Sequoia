@@ -1,0 +1,533 @@
+/**
+ * Emoji picker functionality for Sequoia2 chat
+ * Provides search, selection, and category navigation
+ */
+
+(function() {
+    // Track state
+    let isEmojiPickerVisible = false;
+    let currentCategory = 'frequently-used';
+    let selectedEmoji = null;
+    let recentlyUsedEmojis = [];
+    const MAX_RECENT_EMOJIS = 16;
+    
+    // DOM Elements references (will be initialized when document is ready)
+    let emojiPickerElement;
+    let emojiSearchInput;
+    let emojiPreview;
+    let emojiPreviewName;
+    let emojiPreviewCharacter;
+    let emojiCategoryNav;
+    let emojiResultsContainer;
+    
+    // Initialize the emoji picker
+    function initEmojiPicker() {
+        // Get DOM references
+        emojiPickerElement = document.getElementById('emoji-picker');
+        emojiSearchInput = document.getElementById('emoji-search');
+        emojiPreview = document.getElementById('emoji-preview');
+        emojiPreviewName = document.getElementById('emoji-preview-name');
+        emojiPreviewCharacter = document.getElementById('emoji-preview-emoji');
+        emojiCategoryNav = document.getElementById('emoji-category-nav');
+        emojiResultsContainer = document.getElementById('emoji-results');
+        
+        // Set up event listeners
+        emojiSearchInput.addEventListener('input', handleEmojiSearch);
+        
+        // Set up category navigation
+        setupCategoryNavigation();
+        
+        // Load initial emojis
+        loadEmojiCategory(currentCategory);
+        
+        // Load any saved recently used emojis from localStorage
+        loadRecentlyUsedEmojis();
+    }
+    
+    // Setup category navigation
+    function setupCategoryNavigation() {
+        // Create category buttons
+        const categories = [
+            { id: 'frequently-used', icon: '🕒', name: 'Recent' },
+            { id: 'smileys', icon: '😀', name: 'Smileys' },
+            { id: 'people', icon: '👋', name: 'People' },
+            { id: 'nature', icon: '🐶', name: 'Animals' },
+            { id: 'food', icon: '🍎', name: 'Food' },
+            { id: 'activities', icon: '⚽', name: 'Activities' },
+            { id: 'travel', icon: '🚗', name: 'Travel' },
+            { id: 'objects', icon: '💡', name: 'Objects' },
+            { id: 'symbols', icon: '❤️', name: 'Symbols' },
+            { id: 'flags', icon: '🏁', name: 'Flags' }
+        ];
+        
+        // Clear existing buttons
+        emojiCategoryNav.innerHTML = '';
+        
+        // Add category buttons
+        categories.forEach(category => {
+            const categoryButton = document.createElement('button');
+            categoryButton.className = 'emoji-category-btn';
+            categoryButton.title = category.name;
+            categoryButton.setAttribute('data-category', category.id);
+            
+            // Safely use twemoji if it's available
+            if (typeof twemoji !== 'undefined') {
+                categoryButton.innerHTML = twemoji.parse(category.icon);
+            } else {
+                categoryButton.innerHTML = category.icon;
+                console.warn('Twemoji not loaded, using plain emoji');
+            }
+            
+            if (category.id === currentCategory) {
+                categoryButton.classList.add('active');
+            }
+            
+            categoryButton.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.emoji-category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                categoryButton.classList.add('active');
+                
+                // Load emojis for this category
+                currentCategory = category.id;
+                loadEmojiCategory(currentCategory);
+                
+                // Clear search input
+                emojiSearchInput.value = '';
+            });
+            
+            emojiCategoryNav.appendChild(categoryButton);
+        });
+    }
+    
+    // Load emojis for a specific category
+    function loadEmojiCategory(categoryId) {
+        // Use our emoji data
+        const emojisToDisplay = emojiData[categoryId] || [];
+        
+        // Special case for "frequently-used" - use our stored recents if available
+        if (categoryId === 'frequently-used' && recentlyUsedEmojis.length > 0) {
+            renderEmojiResults(recentlyUsedEmojis);
+        } else {
+            renderEmojiResults(emojisToDisplay);
+        }
+    }
+    
+    // Handle emoji search
+    function handleEmojiSearch(event) {
+        const query = event.target.value.trim();
+        
+        if (!query) {
+            // If search is cleared, show current category
+            loadEmojiCategory(currentCategory);
+            return;
+        }
+        
+        // Search emojis
+        const results = searchEmojis(query);
+        renderEmojiResults(results);
+    }
+    
+    // Render emoji search/category results
+    function renderEmojiResults(emojis) {
+        // Clear existing results
+        emojiResultsContainer.innerHTML = '';
+        
+        if (emojis.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'emoji-no-results';
+            noResults.textContent = 'No emojis found';
+            emojiResultsContainer.appendChild(noResults);
+            return;
+        }
+        
+        // Create and append emoji buttons
+        emojis.forEach(emoji => {
+            const emojiButton = document.createElement('button');
+            emojiButton.className = 'emoji-result-item';
+            emojiButton.setAttribute('data-emoji', emoji.emoji);
+            emojiButton.setAttribute('data-name', emoji.name);
+            emojiButton.setAttribute('data-shortcode', emoji.shortcode);
+            emojiButton.title = emoji.name;
+            
+            // Set inner HTML with Twemoji parsing
+            emojiButton.innerHTML = typeof twemoji !== 'undefined' ? twemoji.parse(emoji.emoji) : emoji.emoji;
+            
+            // Add event listeners
+            emojiButton.addEventListener('click', () => {
+                selectEmoji(emoji);
+            });
+            
+            emojiButton.addEventListener('mouseover', () => {
+                showEmojiPreview(emoji);
+            });
+            
+            emojiResultsContainer.appendChild(emojiButton);
+        });
+    }
+    
+    // Show emoji preview
+    function showEmojiPreview(emoji) {
+        emojiPreview.style.display = 'flex';
+        emojiPreviewName.textContent = emoji.name;
+        emojiPreviewCharacter.innerHTML = typeof twemoji !== 'undefined' ? twemoji.parse(emoji.emoji) : emoji.emoji;
+    }
+    
+    // Hide emoji preview
+    function hideEmojiPreview() {
+        emojiPreview.style.display = 'none';
+    }
+    
+    // Select an emoji (for insertion)
+    function selectEmoji(emoji) {
+        // Add to recently used
+        addToRecentlyUsed(emoji);
+        
+        // Hide the picker
+        toggleEmojiPicker(false);
+        
+        // Send the emoji to the input field or message
+        insertEmojiIntoMessage(emoji.emoji);
+    }
+    
+    // Add emoji to recently used
+    function addToRecentlyUsed(emoji) {
+        // Remove emoji if it already exists in the recently used list
+        recentlyUsedEmojis = recentlyUsedEmojis.filter(item => item.emoji !== emoji.emoji);
+        
+        // Add emoji to the beginning of the list
+        recentlyUsedEmojis.unshift(emoji);
+        
+        // Limit to MAX_RECENT_EMOJIS
+        if (recentlyUsedEmojis.length > MAX_RECENT_EMOJIS) {
+            recentlyUsedEmojis = recentlyUsedEmojis.slice(0, MAX_RECENT_EMOJIS);
+        }
+        
+        // Save to localStorage
+        saveRecentlyUsedEmojis();
+    }
+    
+    // Save recently used emojis to localStorage
+    function saveRecentlyUsedEmojis() {
+        try {
+            localStorage.setItem('sequoia2_recent_emojis', JSON.stringify(recentlyUsedEmojis));
+        } catch (e) {
+            console.error('Failed to save recent emojis:', e);
+        }
+    }
+    
+    // Load recently used emojis from localStorage
+    function loadRecentlyUsedEmojis() {
+        try {
+            const saved = localStorage.getItem('sequoia2_recent_emojis');
+            if (saved) {
+                recentlyUsedEmojis = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('Failed to load recent emojis:', e);
+            recentlyUsedEmojis = [];
+        }
+    }
+    
+    // Toggle the emoji picker visibility
+    function toggleEmojiPicker(show) {
+        isEmojiPickerVisible = show !== undefined ? show : !isEmojiPickerVisible;
+        
+        if (isEmojiPickerVisible) {
+            emojiPickerElement.style.display = 'flex';
+            emojiSearchInput.focus();
+            
+            // Position the picker
+            positionEmojiPicker();
+        } else {
+            emojiPickerElement.style.display = 'none';
+            hideEmojiPreview();
+        }
+    }
+    
+    // Position the emoji picker relative to the current message input
+    function positionEmojiPicker() {
+        // Position logic can be adjusted based on where the trigger button is
+        const messageInput = document.getElementById('message-input');
+        const emojiButton = document.querySelector('.emoji-button');
+        
+        if (emojiButton && emojiPickerElement) {
+            const rect = emojiButton.getBoundingClientRect();
+            emojiPickerElement.style.bottom = `${window.innerHeight - rect.top + 5}px`;
+            emojiPickerElement.style.right = `${window.innerWidth - rect.right - 320}px`;
+        }
+    }
+    
+    // Insert emoji into message input
+    function insertEmojiIntoMessage(emojiChar) {
+        const messageInput = document.getElementById('message-input');
+        if (!messageInput) return;
+        
+        // Get cursor position
+        const cursorPosition = messageInput.selectionStart;
+        
+        // Insert emoji at cursor position
+        const currentValue = messageInput.value;
+        messageInput.value = currentValue.slice(0, cursorPosition) + emojiChar + currentValue.slice(cursorPosition);
+        
+        // Move cursor after inserted emoji
+        messageInput.selectionStart = cursorPosition + emojiChar.length;
+        messageInput.selectionEnd = cursorPosition + emojiChar.length;
+        
+        // Focus back on input
+        messageInput.focus();
+    }
+    
+    // Add emoji reaction to a message
+    function addEmojiReaction(messageId, emojiChar) {
+        const message = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        if (!message) return;
+        
+        // Check if reactions container exists
+        let reactionsContainer = message.querySelector('.message-reactions');
+        if (!reactionsContainer) {
+            // Create reactions container if it doesn't exist
+            reactionsContainer = document.createElement('div');
+            reactionsContainer.className = 'message-reactions';
+            message.appendChild(reactionsContainer);
+        }
+        
+        // Check if this reaction already exists
+        const existingReaction = reactionsContainer.querySelector(`.reaction[data-emoji="${emojiChar}"]`);
+        
+        // If the reaction exists, just increment it
+        if (existingReaction) {
+            // Increment count
+            const countElement = existingReaction.querySelector('.reaction-count');
+            let count = parseInt(countElement.textContent);
+            countElement.textContent = (count + 1).toString();
+            existingReaction.classList.add('user-reacted');
+            existingReaction.setAttribute('data-count', count + 1);
+            return; // We're done since we're just adding to an existing reaction
+        }
+        
+        // Get all existing reactions
+        const existingReactions = reactionsContainer.querySelectorAll('.reaction');
+        
+        // If we already have 5 different reactions and trying to add a new one, don't allow it
+        if (existingReactions.length >= 5) {
+            // Show a toast notification using the global function
+            window.showReactionLimitToast(message);
+            return;
+        }
+        
+        // Create new reaction
+        const reaction = document.createElement('div');
+        reaction.className = 'reaction user-reacted';
+        reaction.setAttribute('data-emoji', emojiChar);
+        reaction.setAttribute('data-count', '1');
+        reaction.innerHTML = `
+            <span class="reaction-emoji">${typeof twemoji !== 'undefined' ? twemoji.parse(emojiChar) : emojiChar}</span>
+            <span class="reaction-count">1</span>
+        `;
+        
+        // Add click handler for toggling reaction
+        reaction.addEventListener('click', function() {
+            toggleReaction(messageId, emojiChar);
+        });
+        
+        reactionsContainer.appendChild(reaction);
+    }
+    
+    // Toggle emoji reaction (add/remove)
+    function toggleReaction(messageId, emojiChar) {
+        const message = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        if (!message) return;
+        
+        const reactionsContainer = message.querySelector('.message-reactions');
+        if (!reactionsContainer) return;
+        
+        const reaction = reactionsContainer.querySelector(`.reaction[data-emoji="${emojiChar}"]`);
+        if (!reaction) return;
+        
+        const countElement = reaction.querySelector('.reaction-count');
+        let count = parseInt(countElement.textContent);
+        
+        if (reaction.classList.contains('user-reacted')) {
+            // Remove user's reaction
+            reaction.classList.remove('user-reacted');
+            count--;
+            
+            if (count <= 0) {
+                // Remove reaction element if count reaches 0
+                reactionsContainer.removeChild(reaction);
+                
+                // Remove reactions container if empty
+                if (reactionsContainer.children.length === 0) {
+                    message.removeChild(reactionsContainer);
+                }
+            } else {
+                countElement.textContent = count.toString();
+            }
+        } else {
+            // Add user's reaction
+            reaction.classList.add('user-reacted');
+            count++;
+            countElement.textContent = count.toString();
+        }
+    }
+    
+    // Setup emoji buttons on message actions
+    function setupMessageEmojiButtons() {
+        document.querySelectorAll('.message-action-emoji').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                
+                const messageId = button.closest('.message').getAttribute('data-message-id');
+                openEmojiPickerForReaction(messageId, button);
+            });
+        });
+    }
+    
+    // Open emoji picker for reaction selection
+    function openEmojiPickerForReaction(messageId, triggerElement) {
+        // Save current target message
+        emojiPickerElement.setAttribute('data-target-message', messageId);
+        
+        // Position picker near the trigger element
+        const rect = triggerElement.getBoundingClientRect();
+        emojiPickerElement.style.bottom = `${window.innerHeight - rect.top + 5}px`;
+        emojiPickerElement.style.right = `${window.innerWidth - rect.right - 320}px`;
+        
+        // Show the picker
+        toggleEmojiPicker(true);
+        
+        // Change picker mode for reactions
+        emojiPickerElement.setAttribute('data-mode', 'reaction');
+        
+        // Override the selectEmoji function temporarily
+        const originalSelectEmoji = selectEmoji;
+        selectEmoji = function(emoji) {
+            // Add reaction to the message
+            addEmojiReaction(messageId, emoji.emoji);
+            
+            // Add to recently used
+            addToRecentlyUsed(emoji);
+            
+            // Hide the picker
+            toggleEmojiPicker(false);
+            
+            // Restore original function
+            selectEmoji = originalSelectEmoji;
+            
+            // Reset picker mode
+            emojiPickerElement.removeAttribute('data-mode');
+            emojiPickerElement.removeAttribute('data-target-message');
+        };
+    }
+    
+    // Event handler for emoji picker close button
+    function handleEmojiPickerClose() {
+        toggleEmojiPicker(false);
+        
+        // Reset any temporary overrides
+        selectEmoji = window.originalSelectEmoji || selectEmoji;
+        
+        // Reset picker mode
+        emojiPickerElement.removeAttribute('data-mode');
+        emojiPickerElement.removeAttribute('data-target-message');
+    }
+    
+    // Export functions to global scope
+    window.emojiPicker = {
+        init: initEmojiPicker,
+        toggle: toggleEmojiPicker,
+        addReaction: addEmojiReaction,
+        toggleReaction: toggleReaction,
+        setupMessageButtons: setupMessageEmojiButtons
+    };
+    
+    // Show toast notification when reaction limit is reached
+    function showReactionLimitToast(messageElement) {
+        // Create toast element if it doesn't exist
+        let toast = document.getElementById('reaction-limit-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'reaction-limit-toast';
+            toast.className = 'reaction-limit-toast';
+            toast.textContent = 'Maximum of 5 reactions per message reached';
+            document.body.appendChild(toast);
+            
+            // Add style if not already in the document
+            if (!document.getElementById('reaction-limit-toast-style')) {
+                const style = document.createElement('style');
+                style.id = 'reaction-limit-toast-style';
+                style.textContent = `
+                    .reaction-limit-toast {
+                        position: fixed;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        z-index: 10000;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                        pointer-events: none;
+                    }
+                    .reaction-limit-toast.visible {
+                        opacity: 1;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Show and then hide the toast
+        toast.classList.add('visible');
+        setTimeout(() => {
+            toast.classList.remove('visible');
+        }, 2000);
+    }
+    
+    // Make showReactionLimitToast available globally
+    window.showReactionLimitToast = showReactionLimitToast;
+    
+    // Initialize when document is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        initEmojiPicker();
+        
+        // Setup emoji button in message input
+        const emojiButton = document.querySelector('.emoji-button');
+        if (emojiButton) {
+            emojiButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleEmojiPicker();
+            });
+        }
+        
+        // Setup close button
+        const closeButton = document.getElementById('emoji-picker-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', handleEmojiPickerClose);
+        }
+        
+        // Close picker when clicking outside
+        document.addEventListener('click', (event) => {
+            if (isEmojiPickerVisible && !emojiPickerElement.contains(event.target) && 
+                !event.target.classList.contains('emoji-button')) {
+                toggleEmojiPicker(false);
+            }
+        });
+        
+        // Log initialization status
+        console.log('EmojiPicker initialized successfully');
+        if (typeof twemoji === 'undefined') {
+            console.warn('Warning: Twemoji not loaded, emoji will display as native characters');
+        }
+        });
+        
+        // Setup existing message emoji buttons
+        setupMessageEmojiButtons();
+    })();

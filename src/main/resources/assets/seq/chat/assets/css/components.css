@@ -1,0 +1,236 @@
+/* Compact tab configuration overrides + custom scrollbar
+	 Purpose: make the Create/Edit Tab panel denser and replace the native scrollbar
+	 with a thin monochrome track/thumb that fits the app theme. These rules use
+	 component-scoped selectors to avoid touching the main chat.html file.
+*/
+
+.chat-tab-config {
+	/* Slightly narrower panel and tighter padding */
+	max-width: 640px !important;
+	padding: 6px !important;
+	border-radius: 10px !important;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+}
+
+.chat-tab-config .tab-config-header {
+	padding: 6px 10px !important;
+	height: 44px !important;
+}
+
+.chat-tab-config .chat-title {
+	font-size: 14px !important;
+	line-height: 20px !important;
+}
+
+.chat-tab-config .tab-config-body {
+	padding: 8px 10px !important;
+	max-height: 68vh !important;
+	overflow-y: auto !important;
+	-webkit-overflow-scrolling: touch !important;
+}
+
+.chat-tab-config .config-section,
+.chat-tab-config .config-field {
+	margin-bottom: 8px !important;
+}
+
+.chat-tab-config label {
+	font-size: 13px !important;
+	margin-bottom: 6px !important;
+	color: rgba(255,255,255,0.85) !important;
+}
+
+.chat-tab-config input[type="text"],
+.chat-tab-config input[type="number"],
+.chat-tab-config .filter-pattern-input,
+.chat-tab-config select,
+.chat-tab-config textarea {
+	padding: 7px 10px !important;
+	height: 34px !important;
+	font-size: 13px !important;
+	border-radius: 6px !important;
+}
+
+.chat-tab-config .message-types-grid {
+	display: grid !important;
+	/* Make columns sized to content so items don't stretch to fill the row */
+	grid-template-columns: repeat(auto-fit, minmax(80px, max-content)) !important;
+	gap: 6px !important;
+	align-items: start !important;
+	grid-auto-flow: row dense !important;
+	justify-content: start !important;
+}
+
+.chat-tab-config .message-type-checkbox {
+	/* Smaller padding and tighter height */
+	padding: 6px 8px !important;
+	min-height: 32px !important;
+	/* Use inline-grid so the item sizes to content and doesn't stretch */
+	display: inline-grid !important;
+	grid-auto-flow: column !important;
+	grid-auto-columns: auto !important;
+	grid-template-columns: 18px auto !important;
+	gap: 8px !important;
+	align-items: center !important;
+	font-size: 13px !important;
+	border-radius: 6px !important;
+	justify-self: start !important;
+	width: auto !important;
+	white-space: nowrap !important;
+}
+
+.chat-tab-config .message-type-checkbox .custom-checkbox {
+	width: 18px !important;
+	height: 18px !important;
+}
+
+.chat-tab-config .tab-config-actions {
+	display: flex !important;
+	gap: 8px !important;
+	justify-content: flex-end !important;
+	padding: 8px 10px !important;
+}
+
+/* Compact button sizing */
+.chat-tab-config .tab-config-btn {
+	padding: 6px 10px !important;
+	height: 34px !important;
+	font-size: 13px !important;
+}
+
+
+/* Subtle, modern dark scrollbar for the entire app */
+html, body, * {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(60,60,60,0.3) rgba(20,20,20,0.95);
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+	background: transparent;
+}
+::-webkit-scrollbar-track {
+	background: rgba(20,20,20,0.95);
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(120,120,120,0.10);
+	border-radius: 10px;
+	border: 2px solid rgba(20,20,20,0.95);
+	background-clip: padding-box;
+	transition: background 0.2s;
+	min-height: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(180,180,180,0.18);
+}
+::-webkit-scrollbar-corner {
+	background: rgba(20,20,20,0.95);
+}
+
+/* If the grid still doesn't take effect because of a very narrow parent, allow denser columns */
+@media (max-width: 420px) {
+	.chat-tab-config .message-types-grid {
+		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+		gap: 6px !important;
+	}
+	.chat-tab-config .message-type-checkbox { padding: 6px 8px !important; font-size: 12px !important; }
+}
+
+/* Polished dark-themed scrollbar that matches the app UI.
+	 This block is appended with selectors specific to the config panel and
+	 uses slightly stronger colors so it looks consistent and overrides earlier rules.
+*/
+.chat-tab-config .tab-config-body,
+.chat-tab-config .tab-config-body * {
+	scrollbar-width: thin !important; /* Firefox */
+	scrollbar-color: rgba(255,255,255,0.12) rgba(255,255,255,0.02) !important;
+}
+
+.chat-tab-config .tab-config-body::-webkit-scrollbar {
+	width: 10px !important;
+	height: 10px !important;
+}
+.chat-tab-config .tab-config-body::-webkit-scrollbar-track {
+	background: rgba(255,255,255,0.02) !important;
+	border-radius: 12px !important;
+	margin: 6px 0 !important;
+}
+.chat-tab-config .tab-config-body::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06)) !important;
+	border-radius: 12px !important;
+	border: 2px solid rgba(0,0,0,0.35) !important; /* subtle inner border to match panel */
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.4) !important;
+	background-clip: padding-box !important;
+}
+.chat-tab-config .tab-config-body::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.10)) !important;
+}
+.chat-tab-config .tab-config-body::-webkit-scrollbar-corner {
+	background: transparent !important;
+}
+
+/* Ensure the outer panel doesn't produce the scrollbar — the inner body should scroll */
+/* Remove overlay/absolute/floating styles for .chat-tab-config so it fills the chat area as a real tab */
+#chatTabConfig, .chat-tab-config {
+	overflow: visible !important;
+	position: static !important;
+	top: auto !important;
+	left: auto !important;
+	right: auto !important;
+	bottom: auto !important;
+	z-index: auto !important;
+	box-shadow: none !important;
+}
+
+#chatTabConfig .tab-config-body, .chat-tab-config .tab-config-body {
+	overflow-y: auto !important;
+}
+
+/* Very specific rules for the actual scrollable element to override any other rules */
+#chatTabConfig .tab-config-body::-webkit-scrollbar,
+.chat-tab-config .tab-config-body::-webkit-scrollbar {
+	width: 10px !important;
+}
+
+#chatTabConfig .tab-config-body::-webkit-scrollbar-track,
+.chat-tab-config .tab-config-body::-webkit-scrollbar-track {
+	background: rgba(255,255,255,0.02) !important;
+	border-radius: 12px !important;
+}
+
+#chatTabConfig .tab-config-body::-webkit-scrollbar-thumb,
+.chat-tab-config .tab-config-body::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06)) !important;
+	border-radius: 12px !important;
+	border: 2px solid rgba(0,0,0,0.35) !important;
+}
+
+#chatTabConfig .tab-config-body::-webkit-scrollbar-thumb:hover,
+.chat-tab-config .tab-config-body::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.10)) !important;
+}
+
+
+/* Component overrides for chat tab configuration - enforce monochrome grid layout */
+.chat-tab-config .message-types-grid {
+	display: grid !important;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+	grid-auto-flow: row dense !important;
+	gap: 12px !important;
+	width: 100% !important;
+}
+
+.chat-tab-config .message-type-checkbox {
+	display: grid !important;
+	grid-template-columns: 22px 1fr !important;
+	gap: 10px !important;
+	align-items: center !important;
+	width: 100% !important;
+}
+
+.chat-tab-config .message-type-checkbox input[type="checkbox"] {
+	margin: 0 !important;
+}
+
