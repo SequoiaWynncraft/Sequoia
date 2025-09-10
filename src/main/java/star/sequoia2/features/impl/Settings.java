@@ -1,6 +1,7 @@
 package star.sequoia2.features.impl;
 
 import com.collarmc.pounce.Subscribe;
+import lombok.Setter;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.events.input.KeyEvent;
 import star.sequoia2.gui.Fonts;
@@ -34,7 +35,7 @@ public class Settings extends Feature {
     ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(-12615215));
     ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(-12615215));
 
-    @Getter
+    @Getter @Setter
     public ClickGUIScreen clickGui;
 
     public Settings() {
