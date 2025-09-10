@@ -77,8 +77,9 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
         Color light = features().get(Settings.class).map(Settings::getThemeLight).orElse(Color.black());
         Color accent1 = features().get(Settings.class).map(Settings::getThemeAccent1).orElse(Color.black());
         Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
+        Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
 
-        Color bgEnd = hovering ? bgStart : dark;
+        Color bgEnd = hovering ? accent1 : accent3;
         render2DUtil().roundGradientFilled(context.getMatrices(), left, top, right, bottom, root.rounding, bgEnd, accent1, true);
 
         context.getMatrices().push();
