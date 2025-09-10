@@ -2,9 +2,14 @@ package star.sequoia2.features.impl;
 
 import com.collarmc.pounce.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import star.sequoia2.accessors.RenderUtilAccessor;
+import star.sequoia2.client.SeqClient;
+import star.sequoia2.events.PacketEvent;
 import star.sequoia2.events.Render3DEvent;
 import star.sequoia2.features.ToggleFeature;
+import star.sequoia2.settings.types.BooleanSetting;
+import star.sequoia2.settings.types.ColorSetting;
 import star.sequoia2.utils.Timer;
 import star.sequoia2.utils.render.TextureStorage;
 import net.minecraft.client.gl.ShaderProgramKeys;
@@ -18,19 +23,34 @@ import java.awt.*;
 
 import static star.sequoia2.client.SeqClient.mc;
 
-public class RenderTest extends ToggleFeature implements RenderUtilAccessor {
+public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
+
+    ColorSetting color = settings().color("Color", "color of the sorrow", new mil.nga.color.Color(255, 0, 0));
+
+    BooleanSetting sneak = settings().bool("CheckSneaking", "toggle to check sneaking to detect sorrow", false);
 
     private final Timer timer;
+    private final Timer sorrowTimer;
 
-    public RenderTest() {
-        super("RenderTest", "test render thing");
+    public SorrowRender() {
+        super("SorrowRender", "Custom visuals for blood sorrow");
         timer = new Timer();
+        sorrowTimer = new Timer();
         timer.reset();
+    }
+
+    @Subscribe
+    public void onPacketReceive(PacketEvent.PacketReceiveEvent event) {
+        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value().toString().startsWith("SoundEvent[location=minecraft:entity.wither.spawn") && (sneak.get() ? mc.player.isSneaking() : true)) {
+            SeqClient.info(soundPacket.getSound().value().toString());
+            sorrowTimer.reset();
+        }
     }
 
     @Subscribe
     public void onRender3D(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
+        if (sorrowTimer.passed(1600L)) return;
 
         float delta = render3DUtil().getTickDelta();
 
@@ -59,7 +79,7 @@ public class RenderTest extends ToggleFeature implements RenderUtilAccessor {
 
         Vec3d end = start.add(forward.multiply(20.0));
 
-        render3DUtil().drawLine(event.matrices(), start, end, new mil.nga.color.Color(55, 93, 218, 150), 4f, true);
+        render3DUtil().drawLine(event.matrices(), start, end, color.get(), 4f, true);
 
         final int ringCount = 6;
         final float baseRadius = 0.1f;
@@ -118,7 +138,7 @@ public class RenderTest extends ToggleFeature implements RenderUtilAccessor {
 
         Matrix4f mat = matrices.peek().getPositionMatrix();
         Vec3d cam = mc.getEntityRenderDispatcher().camera.getPos();
-        int packed = new Color(55, 93, 218, 255).getRGB();
+        int packed = new Color(color.get().getRed(), color.get().getGreen(), color.get().getBlue(), color.get().getAlpha()).getRGB();
 
         buffer.vertex(mat, (float)(p0.x - cam.x), (float)(p0.y - cam.y), (float)(p0.z - cam.z)).texture(0, 1).color(packed);
         buffer.vertex(mat, (float)(p1.x - cam.x), (float)(p1.y - cam.y), (float)(p1.z - cam.z)).texture(1, 1).color(packed);

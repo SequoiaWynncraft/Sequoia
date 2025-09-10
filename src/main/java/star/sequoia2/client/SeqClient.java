@@ -24,7 +24,7 @@ import star.sequoia2.features.Features;
 import star.sequoia2.features.impl.CustomChat;
 import star.sequoia2.features.impl.PartyHealthDisplay;
 import star.sequoia2.features.impl.Settings;
-import star.sequoia2.features.impl.RenderTest;
+import star.sequoia2.features.impl.SorrowRender;
 import star.sequoia2.features.impl.ws.ChatHookFeature;
 import star.sequoia2.features.impl.ws.DiscordChatBridgeFeature;
 import star.sequoia2.features.impl.ws.WebSocketFeature;
@@ -168,7 +168,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
     private void registerFeatures() {
         features.add(new Settings()); // always first so you can get colors
-        features.add(new RenderTest());
+        features.add(new SorrowRender());
         features.add(new PartyHealthDisplay());
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());
