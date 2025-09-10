@@ -33,7 +33,7 @@ public class Settings extends Feature {
     ColorSetting colorLight = settings().color("Light", "Light color", new Color(-66308));
     ColorSetting colorAccent1 = settings().color("Accent1", "Accent1 color", new Color(-12041351));
     ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(-12615215));
-    ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(-12615215));
+    ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(-12567948));
 
     @Getter @Setter
     public ClickGUIScreen clickGui;
