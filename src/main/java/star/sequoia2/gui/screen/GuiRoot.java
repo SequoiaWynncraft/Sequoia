@@ -25,13 +25,13 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
     private float x, y;
     private float w, h;
 
-    public final float boxHeight = 300;
-    public final float boxWidth = 380;
-    public final float pad = 5f;
-    public final float btnW = 50f;
-    public final float btnH = 20f;
-    public final float btnGap = 3f;
-    public final float rounding = 6f;
+    public final float boxHeight = features().get(Settings.class).map(settings -> settings.getBoxH().get()).orElse(300f);
+    public final float boxWidth = features().get(Settings.class).map(settings -> settings.getBoxW().get()).orElse(380f);
+    public final float pad = features().get(Settings.class).map(settings -> settings.getPad().get()).orElse(5f);
+    public final float btnW = features().get(Settings.class).map(settings -> settings.getBtndW().get()).orElse(50f);
+    public final float btnH = features().get(Settings.class).map(settings -> settings.getBtnH().get()).orElse(20f);
+    public final float btnGap = features().get(Settings.class).map(settings -> settings.getBtnGap().get()).orElse(3f);
+    public final float rounding = features().get(Settings.class).map(settings -> settings.getRounding().get()).orElse(6f);
 
     public GuiRoot(List<RelativeComponent> categories) {
         this.categories = categories;

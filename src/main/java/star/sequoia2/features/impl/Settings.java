@@ -16,12 +16,11 @@ import org.lwjgl.glfw.GLFW;
 
 import static star.sequoia2.client.SeqClient.mc;
 
-
+@Getter
 public class Settings extends Feature {
 
     public final KeybindSetting menuKeybind = settings().binding("GuiKey:", "Opens the ClickGui", Binding.withKey(GLFW.GLFW_KEY_O));
 
-    @Getter
     public EnumSetting<Themes.ThemeEnum> theme = settings().options("ChatTheme", "ChatTheme Setting", Themes.ThemeEnum.NEXUS, Themes.ThemeEnum.class);
 
     public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Arial", () -> SeqClient.getFonts().fonts());
@@ -35,15 +34,19 @@ public class Settings extends Feature {
     ColorSetting colorAccent2 = settings().color("Accent2", "Accent2 color", new Color(-12615215));
     ColorSetting colorAccent3 = settings().color("Accent3", "Accent3 color", new Color(-12567948));
 
-    @Getter @Setter
+    FloatSetting boxW = settings().number("GuiWidth", "", 380f, 200f, 600f);
+    FloatSetting boxH = settings().number("GuiHeight", "", 300f, 200f, 600f);
+    FloatSetting pad = settings().number("Pad", "", 5f, 1f, 10f);
+    FloatSetting btndW = settings().number("ButtonWidth", "", 50f, 40f, 60f);
+    FloatSetting btnH = settings().number("ButtonHeight", "", 20f, 10f, 40f);
+    FloatSetting btnGap = settings().number("ButtonGap", "", 3f, 1f, 5f);
+    FloatSetting rounding = settings().number("Rounding", "", 6f, 0f, 8f);
+
+    @Setter
     public ClickGUIScreen clickGui;
 
     public Settings() {
         super("Settings", "Settings settings");
-    }
-
-    public int getSoundVolume() {
-        return volume.get();
     }
 
     public int getNormalColorInt() {
