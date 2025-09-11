@@ -34,9 +34,9 @@ jobs:
           echo "Renaming $JAR_FILE to Seq.jar"
           mv $JAR_FILE build/libs/Seq.jar
 
-#      - name: Upload JAR
-#        run: |
-#          echo "Uploading Seq.jar"
-#          curl -X POST -H "Content-Type: multipart/form-data" \
-#          -F "file=@build/libs/Seq.jar" \
-#          ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Upload JAR
+        run: |
+          echo "Uploading Seq.jar"
+          curl -X POST -H "Content-Type: multipart/form-data" \
+          -F "file=@build/libs/Seq.jar" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
