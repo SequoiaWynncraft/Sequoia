@@ -2,23 +2,24 @@ package star.sequoia2.features.impl;
 
 import com.collarmc.pounce.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.floats.FloatSet;
+import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Arm;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 import star.sequoia2.accessors.RenderUtilAccessor;
-import star.sequoia2.client.SeqClient;
 import star.sequoia2.events.PacketEvent;
 import star.sequoia2.events.Render3DEvent;
 import star.sequoia2.features.ToggleFeature;
 import star.sequoia2.settings.types.BooleanSetting;
 import star.sequoia2.settings.types.ColorSetting;
+import star.sequoia2.settings.types.FloatSetting;
 import star.sequoia2.utils.Timer;
 import star.sequoia2.utils.render.TextureStorage;
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 
@@ -29,6 +30,9 @@ public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
     ColorSetting color = settings().color("Color", "color of the sorrow", new mil.nga.color.Color(255, 0, 0));
 
     BooleanSetting sneak = settings().bool("CheckSneaking", "toggle to check sneaking to detect sorrow", false);
+
+    FloatSetting duration = settings().number("Duration", "Duration of the sorrow seconds", 1.6f, 0.1f, 20f);
+    FloatSetting delay = settings().number("Delay", "Delay before sorrow starts seconds", 1.6f, 0.1f, 20f);
 
     private final Timer timer;
     private final Timer sorrowTimer;
@@ -42,8 +46,7 @@ public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
 
     @Subscribe
     public void onPacketReceive(PacketEvent.PacketReceiveEvent event) {
-        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value() == SoundEvents.ENTITY_WITHER_SHOOT && (!sneak.get() || mc.player.isSneaking())) {
-            SeqClient.info(soundPacket.getSound().value().toString());
+        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value().id().equals(SoundEvents.ENTITY_WITHER_SHOOT.id()) && (!sneak.get() || mc.player.isSneaking())) {
             sorrowTimer.reset();
         }
     }
@@ -51,7 +54,7 @@ public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
     @Subscribe
     public void onRender3D(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
-        if (sorrowTimer.passed(1600L)) return;
+        if (sorrowTimer.passed((long) ((delay.get() + duration.get()) * 1000L)) || !sorrowTimer.passed((long) (delay.get() * 1000L))) return;
 
         float delta = render3DUtil().getTickDelta();
 

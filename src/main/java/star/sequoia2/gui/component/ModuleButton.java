@@ -58,6 +58,12 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
             components.add(new CalculatedEnumSettingComponent(calculatedEnumSetting));
         } else if(setting instanceof ColorSetting colorSetting) {
             components.add(new ColorSettingComponent(colorSetting));
+        } else if(setting instanceof DoubleSetting doubleSetting) {
+            components.add(new SliderComponent<>(doubleSetting));
+        } else if(setting instanceof FloatSetting doubleSetting) {
+            components.add(new SliderComponent<>(doubleSetting));
+        } else if(setting instanceof IntSetting doubleSetting) {
+            components.add(new SliderComponent<>(doubleSetting));
         }
     }
 
