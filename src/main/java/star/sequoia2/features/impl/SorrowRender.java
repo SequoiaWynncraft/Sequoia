@@ -3,6 +3,7 @@ package star.sequoia2.features.impl;
 import com.collarmc.pounce.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.sound.SoundEvents;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.events.PacketEvent;
@@ -41,7 +42,7 @@ public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
 
     @Subscribe
     public void onPacketReceive(PacketEvent.PacketReceiveEvent event) {
-        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value().toString().startsWith("SoundEvent[location=minecraft:entity.wither.spawn") && (sneak.get() ? mc.player.isSneaking() : true)) {
+        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value() == SoundEvents.ENTITY_WITHER_SHOOT && (!sneak.get() || mc.player.isSneaking())) {
             SeqClient.info(soundPacket.getSound().value().toString());
             sorrowTimer.reset();
         }

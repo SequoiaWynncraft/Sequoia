@@ -7,16 +7,16 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minidev.json.JSONObject;
+import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.services.wynn.player.PlayerResponse;
+import star.sequoia2.client.types.Services;
 import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.component.SearchBarComponent;
-import star.sequoia2.http.Http;
 import star.sequoia2.utils.render.TextureStorage;
-import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +30,10 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
 
     SearchBarComponent searchBarComponent;
 
-    // --- Added for skin preview ---
     private OtherClientPlayerEntity previewPlayer;
     private String previewedUsername;
 
-    private volatile JSONObject currentStats;
+    private volatile PlayerResponse currentPlayer;
 
     public PlayerLookupCategory() {
         super("Lookup");
@@ -70,22 +69,25 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
                 hoverEnter ? new java.awt.Color(dark.getRed(), dark.getGreen(), dark.getBlue(), dark.getAlpha()).getRGB() : new java.awt.Color(light.getRed(), light.getGreen(), light.getBlue(), light.getAlpha()).getRGB());
         matrices.pop();
 
-        if (currentStats != null) {
-            String username = jStr(currentStats, "username");
-            boolean online = jBool(currentStats, "online");
-            String server = jStr(currentStats, "server");
+        if (currentPlayer != null) {
+            String username = currentPlayer.getUsername();
+            boolean online = currentPlayer.isOnline();
+            String server = currentPlayer.getServer();
 
-            double playtime = jDouble(currentStats, "playtime");
+            float playtime = currentPlayer.getPlaytime();
 
-            JSONObject guildObj = jObj(currentStats, "guild");
-            String guildName = guildObj != null ? jStr(guildObj, "name") : null;
-            String guildRank = guildObj != null ? jStr(guildObj, "rank") : null;
+            PlayerResponse.Guild guildObj = currentPlayer.getGuild();
+            String guildName = guildObj != null ? guildObj.getName() : null;
+            String guildRank = guildObj != null ? guildObj.getRank() : null;
 
-            JSONObject raidsList = jObj(jObj(jObj(currentStats, "globalData"), "raids"), "list");
+            Map<String, Integer> raidsList = null;
+            if (currentPlayer.getGlobalData() != null && currentPlayer.getGlobalData().getRaids() != null) {
+                raidsList = currentPlayer.getGlobalData().getRaids().getList();
+            }
 
-            int warsComplete = jInt(jObj(currentStats, "globalData"), "wars");
+            int warsComplete = currentPlayer.getGlobalData() != null ? currentPlayer.getGlobalData().getWars() : 0;
 
-            int totalLevel = jInt(jObj(currentStats, "globalData"), "totalLevel");
+            int totalLevel = currentPlayer.getGlobalData() != null ? currentPlayer.getGlobalData().getTotalLevels() : 0;
 
             float x = left;
             float y = top + getGuiRoot().btnH + 6f;
@@ -121,13 +123,12 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
                 render2DUtil().drawText(context, "No raids found.", x, y, light.getColor(), true);
                 y += line;
             } else {
-                List<Map.Entry<String, Object>> entries = new ArrayList<>(raidsList.entrySet());
+                List<Map.Entry<String, Integer>> entries = new ArrayList<>(raidsList.entrySet());
                 entries.sort((a, b) -> a.getKey().compareToIgnoreCase(b.getKey()));
 
-                for (Map.Entry<String, Object> e : entries) {
+                for (Map.Entry<String, Integer> e : entries) {
                     String raidName = e.getKey();
-                    int clears = (e.getValue() instanceof Number)
-                            ? ((Number) e.getValue()).intValue() : 0;
+                    int clears = e.getValue() != null ? e.getValue() : 0;
 
                     if (y + line > bottom - 4) break;
 
@@ -171,10 +172,10 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
         float top = contentY();
         float right = left + contentWidth();
         if (isWithin(mouseX, mouseY, right - 25f, top, 25, getGuiRoot().btnH) && searchBarComponent.isSearching()) {
-            Http.fetchPlayerFullStats(searchBarComponent.getSearch())
-                    .thenAccept(json -> {
-                        currentStats = json;
-                        tryMakePreviewFromStats(json);
+            Services.Player.getPlayerFullResult(searchBarComponent.getSearch())
+                    .thenAccept(resp -> {
+                        currentPlayer = resp;
+                        tryMakePreviewFromStats(resp);
                     })
                     .exceptionally(ex -> {
                         LOGGER.warn(ex.getMessage());
@@ -189,10 +190,10 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         searchBarComponent.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == GLFW.GLFW_KEY_ENTER && searchBarComponent.isSearching()) {
-            Http.fetchPlayerFullStats(searchBarComponent.getSearch())
-                    .thenAccept(json -> {
-                        currentStats = json;
-                        tryMakePreviewFromStats(json);
+            Services.Player.getPlayerFullResult(searchBarComponent.getSearch())
+                    .thenAccept(resp -> {
+                        currentPlayer = resp;
+                        tryMakePreviewFromStats(resp);
                     })
                     .exceptionally(ex -> {
                         LOGGER.warn(ex.getMessage());
@@ -208,73 +209,23 @@ public class PlayerLookupCategory extends RelativeComponent implements RenderUti
         searchBarComponent.charTyped(chr, modifiers);
     }
 
-    private void tryMakePreviewFromStats(JSONObject stats) {
-        String username = jStr(stats, "username");
-        String uuidStr  = jStr(stats, "uuid");
+    private void tryMakePreviewFromStats(PlayerResponse stats) {
+        String username = stats != null ? stats.getUsername() : null;
+        String uuidStr  = stats != null ? stats.getUuid() : null;
 
         if (uuidStr == null || uuidStr.isBlank()) return;
-        if (previewPlayer != null && username.equalsIgnoreCase(previewedUsername)) return;
+        if (previewPlayer != null && username != null && username.equalsIgnoreCase(previewedUsername)) return;
 
         if (mc.world == null) return;
 
         SeqClient.getProfileFetcher().fetchByUUID(UUID.fromString(uuidStr))
-            .thenAccept(gameProfile -> {
-                previewPlayer = gameProfile.map(profile -> new OtherClientPlayerEntity(mc.world, profile)).orElse(null);
-            });
+                .thenAccept(gameProfile -> {
+                    previewPlayer = gameProfile.map(profile -> new OtherClientPlayerEntity(mc.world, profile)).orElse(null);
+                });
         if (previewPlayer != null) {
             previewPlayer.bodyYaw = 180f;
             previewPlayer.headYaw = 180f;
             previewedUsername = username;
-        }
-    }
-
-    private static String jStr(JSONObject o, String k) {
-        if (o == null) return null;
-        Object v = o.get(k);
-        return (v == null) ? null : String.valueOf(v);
-    }
-
-    private static int jInt(JSONObject o, String k) {
-        if (o == null) return 0;
-        Object v = o.get(k);
-        if (v == null) return 0;
-        if (v instanceof Number) return ((Number) v).intValue();
-        String s = v.toString().trim();
-        if (s.isEmpty() || s.equalsIgnoreCase("null")) return 0;
-        try {
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private static boolean jBool(JSONObject o, String k) {
-        if (o == null) return false;
-        Object v = o.get(k);
-        if (v == null) return false;
-        if (v instanceof Boolean) return (Boolean) v;
-        String s = v.toString().trim();
-        if (s.isEmpty() || s.equalsIgnoreCase("null")) return false;
-        return Boolean.parseBoolean(s);
-    }
-
-    private static JSONObject jObj(JSONObject o, String k) {
-        if (o == null) return null;
-        Object v = o.get(k);
-        return (v instanceof JSONObject) ? (JSONObject) v : null;
-    }
-
-    private static double jDouble(JSONObject o, String k) {
-        if (o == null) return 0.0;
-        Object v = o.get(k);
-        if (v == null) return 0.0;
-        if (v instanceof Number) return ((Number) v).doubleValue();
-        String s = v.toString().trim();
-        if (s.isEmpty() || s.equalsIgnoreCase("null")) return 0.0;
-        try {
-            return Double.parseDouble(s);
-        } catch (NumberFormatException e) {
-            return 0.0;
         }
     }
 }
