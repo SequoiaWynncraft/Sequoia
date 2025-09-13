@@ -72,10 +72,7 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         render2DUtil().disableScissor();
         matrices.pop();
 
-        matrices.push();
-        matrices.translate(bx + pad, by + pad, 0);
-        context.drawTexture(RenderLayer::getGuiTextured , TextureStorage.icon, 0, 0, 0, 0, (int) btnW, (int) btnW, (int) btnW, (int) btnW);
-        matrices.pop();
+        render2DUtil().drawTexture(context, TextureStorage.icon, bx + pad, by + pad, bx + pad + btnW, by + pad + btnW);
 
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;

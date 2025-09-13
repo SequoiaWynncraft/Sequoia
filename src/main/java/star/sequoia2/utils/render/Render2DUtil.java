@@ -14,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
@@ -375,7 +376,7 @@ public class Render2DUtil implements TextRendererAccessor {
         endRender();
     }
 
-    public void drawGlow(DrawContext ctx, float x1, float y1, float x2, float y2, Color baseColor, float rounding) {
+    public void drawGlow(DrawContext ctx, float x1, float y1, float x2, float y2, Color baseColor, float radius) {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
@@ -394,12 +395,20 @@ public class Render2DUtil implements TextRendererAccessor {
                 ctx.getMatrices(),
                 x1 - expand, y1 - expand,
                 x2 + expand, y2 + expand,
-                rounding + expand * 0.6f,
+                    radius + expand * 0.6f,
                 c
             );
         }
 
         RenderSystem.disableBlend();
+    }
+
+    public void drawTexture(DrawContext context, Identifier texture, float x, float y, float x2, float y2) {
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(x, y, 0);
+        context.drawTexture(RenderLayer::getGuiTextured , texture, 0, 0, 0f, 0f, (int) (x2 - x), (int) (y2 - y), (int) (x2 - x), (int) (y2 - y));
+        matrices.pop();
     }
 
     private static float[] lerpColor(int startARGB, int endARGB, float t) {
