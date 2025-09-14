@@ -1,6 +1,7 @@
 package star.sequoia2.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.wynntils.core.components.Handlers;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.components.Services;
 import com.wynntils.models.territories.profile.TerritoryProfile;
@@ -9,25 +10,34 @@ import com.wynntils.services.map.MapTexture;
 import com.wynntils.services.map.pois.Poi;
 import com.wynntils.services.map.pois.TerritoryPoi;
 import com.wynntils.utils.colors.CommonColors;
+import com.wynntils.utils.mc.KeyboardUtils;
+import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.render.MapRenderer;
 import com.wynntils.utils.render.RenderUtils;
 import com.wynntils.utils.type.BoundingBox;
+import com.wynntils.utils.type.CappedValue;
 import mil.nga.color.Color;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import star.sequoia2.accessors.RenderUtilAccessor;
+import star.sequoia2.client.SeqClient;
 import star.sequoia2.utils.render.TextureStorage;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
+import static com.wynntils.models.territories.type.GuildResource.*;
 
 public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUtilAccessor {
     enum Roles { TANK, DPS, HEAL }
     enum UiState { OPTED_OUT, CHOOSING_ROLE, CHOSEN_ROLE }
+
+    CappedValue ore;
+    CappedValue fish;
+    CappedValue wood;
+    CappedValue crop;
 
     static final float SCALE = 1f;
     static final float PAD = 6f * SCALE;
@@ -80,10 +90,56 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         renderPois(context.getMatrices(), mouseX, mouseY);
         RenderUtils.disableScissor(context);
 
-        drawUi(context, mouseX, mouseY);
+        drawRoleUi(context, mouseX, mouseY);
+        drawHqResourceUI(context, mouseX, mouseY);
     }
 
-    void drawUi(DrawContext ctx, int mouseX, int mouseY) {
+    void drawHqResourceUI(DrawContext ctx, int mouseX, int mouseY) {
+        float baseX = renderX + renderedBorderXOffset + mapWidth - PAD;
+        float baseY = renderY + renderedBorderYOffset + PAD;
+
+        float iconH = 20f * SCALE;
+        float iconW = iconH * 2.5f;
+        float gap = 6f * SCALE;
+
+        float panelW = PAD + iconW + gap + iconW + PAD;
+        float panelH = PAD + iconH + gap + iconH + PAD;
+
+        render2DUtil().roundRectFilled(ctx.getMatrices(), baseX - panelW, baseY, baseX, baseY + panelH, 5f, Color.darkGray());
+
+        float x1 = baseX - panelW + PAD;
+        float x2 = x1 + iconW + gap;
+        float y1 = baseY + PAD;
+        float y2 = y1 + iconH + gap;
+
+        drawResourceMeter(ctx, x1, y1, iconW, iconH, valueRatio(ore), TextureStorage.ore_empty, TextureStorage.ore_full);
+        drawResourceMeter(ctx, x2, y1, iconW, iconH, valueRatio(fish), TextureStorage.fish_empty, TextureStorage.fish_full);
+        drawResourceMeter(ctx, x1, y2, iconW, iconH, valueRatio(wood), TextureStorage.wood_empty, TextureStorage.wood_full);
+        drawResourceMeter(ctx, x2, y2, iconW, iconH, valueRatio(crop), TextureStorage.crop_empty, TextureStorage.crop_full);
+    }
+
+    void drawResourceMeter(DrawContext ctx, float x, float y, float w, float h, double ratio, Identifier emptyTex, Identifier fullTex) {
+        render2DUtil().drawTexture(ctx, emptyTex, x, y, x + w, y + h);
+        int sx = (int) x;
+        int sy = (int) y;
+        int sw = (int) (w * Math.max(0d, Math.min(1d, ratio)));
+        int sh = (int) h;
+        if (sw > 0 && sh > 0) {
+            RenderUtils.enableScissor(ctx, sx, sy, sw, sh);
+            render2DUtil().drawTexture(ctx, fullTex, x, y, x + w, y + h);
+            RenderUtils.disableScissor(ctx);
+        }
+    }
+
+    double valueRatio(CappedValue v) {
+        if (v == null) return 0d;
+        double max = v.max();
+        double val = v.current();
+        if (max <= 0d) return 0d;
+        return val / max;
+    }
+
+    void drawRoleUi(DrawContext ctx, int mouseX, int mouseY) {
         float baseX = renderX + renderedBorderXOffset;
         float baseY = renderY + renderedBorderYOffset;
 
@@ -122,7 +178,14 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
 
     @Override
     public boolean doMouseClicked(double mouseX, double mouseY, int button) {
-        if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return super.doMouseClicked(mouseX, mouseY, button);
+        if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT
+                    && KeyboardUtils.isShiftDown()
+                    && hovered instanceof TerritoryPoi territoryPoi) {
+                Handlers.Command.queueCommand("gu territory " + territoryPoi.getName());
+            }
+            return super.doMouseClicked(mouseX, mouseY, button);
+        }
 
         float baseX = renderX + renderedBorderXOffset;
         float baseY = renderY + renderedBorderYOffset;
@@ -206,6 +269,13 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         for (TerritoryPoi poi : advancementPois) {
             TerritoryProfile territoryProfile = Models.Territory.getTerritoryProfile(poi.getName());
             if (territoryProfile != null && territoryProfile.getGuild().equals(poi.getTerritoryInfo().getGuildName())) {
+                if (poi.getTerritoryInfo().isHeadquarters() && poi.getTerritoryInfo().getGuildName().equals("Sequoia")) {
+                    ore = poi.getTerritoryInfo().getStorage(ORE);
+                    fish = poi.getTerritoryInfo().getStorage(FISH);
+                    wood = poi.getTerritoryInfo().getStorage(WOOD);
+                    crop = poi.getTerritoryInfo().getStorage(CROPS);
+                }
+
                 renderedPois.add(poi);
             } else {
                 renderedPois.add(new TerritoryPoi(territoryProfile, poi.getTerritoryInfo()));
@@ -221,5 +291,64 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
                 1,
                 mouseX,
                 mouseY);
+    }
+
+    @Override
+    protected void renderPois(
+            List<Poi> pois,
+            MatrixStack matrixStack,
+            BoundingBox textureBoundingBox,
+            float poiScale,
+            int mouseX,
+            int mouseY) {
+        hovered = null;
+
+        List<Poi> filteredPois = getRenderedPois(pois, textureBoundingBox, poiScale, mouseX, mouseY);
+
+        // Render trading routes
+        // We render them in both directions because optimizing it is not cheap either
+        for (Poi poi : filteredPois) {
+            if (!(poi instanceof TerritoryPoi territoryPoi)) continue;
+
+            float poiRenderX = MapRenderer.getRenderX(poi, mapCenterX, centerX, zoomRenderScale);
+            float poiRenderZ = MapRenderer.getRenderZ(poi, mapCenterZ, centerZ, zoomRenderScale);
+
+            for (String tradingRoute : territoryPoi.getTerritoryInfo().getTradingRoutes()) {
+                Optional<Poi> routePoi = filteredPois.stream()
+                        .filter(filteredPoi -> filteredPoi.getName().equals(tradingRoute))
+                        .findFirst();
+
+                // Only render connection if the other poi is also in the filtered pois
+                if (routePoi.isPresent() && filteredPois.contains(routePoi.get())) {
+                    float x = MapRenderer.getRenderX(routePoi.get(), mapCenterX, centerX, zoomRenderScale);
+                    float z = MapRenderer.getRenderZ(routePoi.get(), mapCenterZ, centerZ, zoomRenderScale);
+
+                    RenderUtils.drawLine(matrixStack, CommonColors.DARK_GRAY, poiRenderX, poiRenderZ, x, z, 0, 1);
+                }
+            }
+        }
+
+        VertexConsumerProvider.Immediate bufferSource = McUtils.mc().getBufferBuilders().getEntityVertexConsumers();
+
+        // Reverse and Render
+        for (int i = filteredPois.size() - 1; i >= 0; i--) {
+            Poi poi = filteredPois.get(i);
+
+            float poiRenderX = MapRenderer.getRenderX(poi, mapCenterX, centerX, zoomRenderScale);
+            float poiRenderZ = MapRenderer.getRenderZ(poi, mapCenterZ, centerZ, zoomRenderScale);
+
+            poi.renderAt(
+                    matrixStack,
+                    bufferSource,
+                    poiRenderX,
+                    poiRenderZ,
+                    hovered == poi,
+                    poiScale,
+                    zoomRenderScale,
+                    zoomLevel,
+                    true);
+        }
+
+        bufferSource.drawCurrentLayer();
     }
 }
