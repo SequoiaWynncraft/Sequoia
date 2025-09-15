@@ -43,7 +43,7 @@ public class AuthCommand extends Command implements FeaturesAccessor {
     private int auth(CommandContext<FabricClientCommandSource> ctx) {
         String code = ctx.getArgument("code", String.class);
         if (CODE_PATTERN.matcher(code).matches()) {
-            if (features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) {
+            if (!features().get(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) {
                 ctx.getSource()
                         .sendError(
                                 SeqClient.prefix(Text.translatable("sequoia.feature.webSocket.featureDisabled")));
