@@ -350,6 +350,10 @@ public class WebSocketFeature extends ToggleFeature {
 //        });
 //    }
 
+    @Override
+    public void onActivate() {
+        connectIfNeeded();
+    }
 
     @Override
     public void onDeactivate() {
