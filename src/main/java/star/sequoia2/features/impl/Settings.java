@@ -23,7 +23,7 @@ public class Settings extends Feature {
 
     public EnumSetting<Themes.ThemeEnum> theme = settings().options("ChatTheme", "ChatTheme Setting", Themes.ThemeEnum.NEXUS, Themes.ThemeEnum.class);
 
-    public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Arial", () -> SeqClient.getFonts().fonts());
+    public CalculatedEnumSetting<Fonts.Font> defaultFont = settings().options("Font", "HUD font", "Minecraft", () -> SeqClient.getFonts().fonts());
 
     IntSetting volume = settings().number("Volume", "Volume of UI sounds.", 100, 0, 100);
 
