@@ -11,7 +11,7 @@ import star.sequoia2.features.impl.ws.DiscordChatBridgeFeature;
 import java.util.List;
 
 import static star.sequoia2.client.types.ws.WSConstants.GSON;
-import static star.sequoia2.utils.URLUtils.sanitize;
+import static star.sequoia2.utils.XMLUtils.extractTextFromXml;
 
 public class SChannelMessageWSMessageHandler extends WSMessageHandler implements TeXParserAccessor, FeaturesAccessor {
     public SChannelMessageWSMessageHandler(String message) {
@@ -22,39 +22,38 @@ public class SChannelMessageWSMessageHandler extends WSMessageHandler implements
 
     @Override
     public void handle() {
-
-        // todo: add hover, add pillbox format, add message length limiter with more hover shenanigans
         SeqClient.debug(wsMessage.toString());
         if (features().getIfActive(DiscordChatBridgeFeature.class).map(DiscordChatBridgeFeature::isActive).orElse(false)
                 && features().getIfActive(DiscordChatBridgeFeature.class).map(discordChatBridgeFeature -> discordChatBridgeFeature.getSendDiscordMessageToChat().get()).orElse(false)) {
             SChannelMessageWSMessage sChannelMessageWSMessage = (SChannelMessageWSMessage) wsMessage;
-            SChannelMessageWSMessage.Data sChannelMessageWSMessageData =
-                    sChannelMessageWSMessage.getSChannelMessageData();
-            McUtils.sendMessageToClient(SeqClient.prefix(teXParser().parseMutableText(MESSAGE_FORMAT, formatColorArgs(sChannelMessageWSMessageData.color()), teXParser().sanitize(sChannelMessageWSMessageData.displayName()), teXParser().sanitize(sChannelMessageWSMessageData.message()))));
-//            String[] displayNameSplit =
-//                    sChannelMessageWSMessageData.displayName().split(" ");
-//            String playerName = displayNameSplit.length > 1 ? displayNameSplit[1] : displayNameSplit[0];
-//            String playerRank = displayNameSplit.length > 1 ? displayNameSplit[0] : null;
-
-
-//            McUtils.sendMessageToClient();
-
-//            McUtils.sendMessageToClient(Fonts.BannerPill.parse("discord")
-//                    .withColor(0x7289DA)
-//                    .append(Component.literal(" "))
-//                    .append(Fonts.BannerPill.parse(getGuildRank(sChannelMessageWSMessageData.sequoiaRoles()))
-//                            .withStyle(ChatFormatting.AQUA))
-//                    .append(Fonts.Default.parse(" " + playerName + ": ").withStyle(ChatFormatting.DARK_AQUA))
-//                    .append(Fonts.Default.parse(sChannelMessageWSMessageData.message())
-//                            .withStyle(ChatFormatting.AQUA)));
+            SChannelMessageWSMessage.Data d = sChannelMessageWSMessage.getSChannelMessageData();
+            String name = d.displayName() == null ? "" : d.displayName();
+            String msg = d.message() == null ? "" : d.message();
+            String messageTeX = isLikelyXml(msg) ? extractTextFromXml(msg) : teXParser().sanitize(msg);
+            McUtils.sendMessageToClient(SeqClient.prefix(
+                    teXParser().parseMutableText(
+                            MESSAGE_FORMAT,
+                            formatColorArgs(d.color()),
+                            teXParser().sanitize(name),
+                            messageTeX
+                    )
+            ));
         }
     }
 
+    private static boolean isLikelyXml(String s) {
+        if (s == null) return false;
+        String t = s.trim();
+        return !t.isEmpty() && t.charAt(0) == '<';
+    }
+
     public static String formatColorArgs(List<Integer> colors) {
+        if (colors == null || colors.isEmpty()) return "{1}{ffffff}";
         StringBuilder sb = new StringBuilder();
         sb.append("{").append(colors.size()).append("}");
         for (Integer color : colors) {
-            sb.append("{").append(String.format("%06x", color)).append("}");
+            int c = color == null ? 0xffffff : color;
+            sb.append("{").append(String.format("%06x", c)).append("}");
         }
         return sb.toString();
     }

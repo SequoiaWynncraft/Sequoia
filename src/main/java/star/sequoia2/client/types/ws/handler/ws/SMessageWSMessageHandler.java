@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 
 import star.sequoia2.accessors.FeaturesAccessor;
+import star.sequoia2.accessors.TeXParserAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.ws.handler.WSMessageHandler;
 import star.sequoia2.client.types.ws.message.ws.SMessageWSMessage;
@@ -18,9 +19,10 @@ import star.sequoia2.utils.URLUtils;
 import java.util.regex.Matcher;
 
 import static star.sequoia2.client.types.ws.WSConstants.GSON;
+import static star.sequoia2.utils.XMLUtils.extractTextFromXml;
 
 
-public class SMessageWSMessageHandler extends WSMessageHandler implements FeaturesAccessor {
+public class SMessageWSMessageHandler extends WSMessageHandler implements FeaturesAccessor, TeXParserAccessor {
     public SMessageWSMessageHandler(String message) {
         super(GSON.fromJson(message, SMessageWSMessage.class), message);
     }
@@ -35,6 +37,14 @@ public class SMessageWSMessageHandler extends WSMessageHandler implements Featur
             if (StringUtils.equals(serverMessageText, "Invalid or expired token provided.\\nVisit https://api.sequoia.ooo/oauth2 to obtain a new session.")) {
                 SeqClient.debug("Received authentication required message, reauthenticating.");
                 features().getIfActive(WebSocketFeature.class).ifPresent(WebSocketFeature::authenticate);
+                return;
+            }
+
+            String trimmed = serverMessageText == null ? "" : serverMessageText.trim();
+            if (trimmed.startsWith("<")) {
+                String tex = extractTextFromXml(serverMessageText);
+                MutableText messageComponent = Text.literal("Server message ➤ ").append(teXParser().parseMutableText(tex));
+                McUtils.sendMessageToClient(SeqClient.prefix(messageComponent));
                 return;
             }
 
