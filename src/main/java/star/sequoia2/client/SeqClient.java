@@ -170,6 +170,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
+        features.add(new EcoMessageFilter());
         //features.add(new BetterGuildMap());
         if (Seq.isHasMCEF()) {
             //features.add(new CustomChat());
