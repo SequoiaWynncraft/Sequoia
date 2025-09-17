@@ -110,12 +110,23 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         RenderSystem.enableDepthTest();
     }
 
+    void fillRoundedGradient(DrawContext ctx, Rect r, float radius, Color start, Color end, boolean sideways) {
+        render2DUtil().roundGradientFilled(ctx.getMatrices(), r.x, r.y, r.x + r.w, r.y + r.h, radius, start, end, sideways);
+    }
 
     void drawCommandUI(DrawContext ctx, int mouseX, int mouseY) {
         float baseX = renderX + renderedBorderXOffset + mapWidth / 2f;
         float baseY = renderY + renderedBorderYOffset + PAD;
         Rect r = new Rect(baseX - CMD_BTN_SIZE / 2f, baseY, CMD_BTN_SIZE, CMD_BTN_SIZE);
-        render2DUtil().roundRectFilled(ctx.getMatrices(), r.x, r.y, r.x + r.w, r.y + r.h, CMD_CORNER, Color.darkGray());
+        boolean hover = r.contains(mouseX, mouseY);
+        Color s = commandActive ? new Color(70, 110, 255, 220) : new Color(48, 48, 54, 220);
+        Color e = commandActive ? new Color(40, 70, 220, 220)  : new Color(26, 26, 32, 220);
+        if (hover) {
+            s = new Color(Math.min(255, s.getRed() + 20), Math.min(255, s.getGreen() + 20), Math.min(255, s.getBlue() + 20), s.getAlpha());
+            e = new Color(Math.min(255, e.getRed() + 20), Math.min(255, e.getGreen() + 20), Math.min(255, e.getBlue() + 20), e.getAlpha());
+            render2DUtil().drawGlow(ctx, r.x, r.y, r.x + r.w, r.y + r.h, new Color(90, 120, 255, 140), CMD_CORNER);
+        }
+        fillRoundedGradient(ctx, r, CMD_CORNER, s, e, true);
         Identifier tex = commandActive ? TextureStorage.command_active : TextureStorage.command_inactive;
         render2DUtil().drawTexture(ctx, tex, r.x + 4, r.y + 4, r.x + r.w - 4, r.y + r.h - 4);
     }
@@ -149,11 +160,20 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         float panelW = PAD + iconW + gap + iconW + PAD;
         float panelH = PAD + namePad + valuePad + iconH + gap + namePad + valuePad + iconH + PAD;
 
-        render2DUtil().roundRectFilled(ctx.getMatrices(), baseX - panelW, baseY, baseX, baseY + panelH, 5f, Color.darkGray());
+        Rect panel = new Rect(baseX - panelW, baseY, panelW, panelH);
+        boolean hover = panel.contains(mouseX, mouseY);
+        Color s = new Color(40, 40, 46, 220);
+        Color e = new Color(22, 22, 28, 220);
+        if (hover) {
+            s = new Color(50, 50, 58, 230);
+            e = new Color(28, 28, 36, 230);
+            render2DUtil().drawGlow(ctx, panel.x, panel.y, panel.x + panel.w, panel.y + panel.h, new Color(80, 110, 255, 90), 6f);
+        }
+        fillRoundedGradient(ctx, panel, 5f, s, e, false);
 
-        float x1 = baseX - panelW + PAD;
+        float x1 = panel.x + PAD;
         float x2 = x1 + iconW + gap;
-        float y1 = baseY + PAD + namePad + valuePad;
+        float y1 = panel.y + PAD + namePad + valuePad;
         float y2 = y1 + iconH + gap + namePad + valuePad;
 
         render2DUtil().drawText(ctx, "Ore",  (int)(x1 + iconW / 2f - textRenderer().getWidth("Ore")  / 2f),  (int)(y1 - valuePad - lh - 2), 0xFFFFFF, true);
@@ -173,13 +193,6 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         drawResourceMeter(ctx, x2, y2, iconW, iconH, valueRatio(crop), TextureStorage.crop_empty, TextureStorage.crop_full);
     }
 
-    String valueText(CappedValue v) {
-        if (v == null) return "0/0";
-        int c = (int) Math.round(v.current());
-        int m = (int) Math.round(v.max());
-        return c + "/" + m;
-    }
-
     void drawResourceMeter(DrawContext ctx, float x, float y, float w, float h, double ratio, Identifier emptyTex, Identifier fullTex) {
         render2DUtil().drawTexture(ctx, emptyTex, x, y, x + w, y + h);
         int sx = (int) x;
@@ -193,28 +206,36 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         }
     }
 
-    double valueRatio(CappedValue v) {
-        if (v == null) return 0d;
-        double max = v.max();
-        double val = v.current();
-        if (max <= 0d) return 0d;
-        return val / max;
-    }
-
     void drawRoleUI(DrawContext ctx, int mouseX, int mouseY) {
         float baseX = renderX + renderedBorderXOffset;
         float baseY = renderY + renderedBorderYOffset;
 
         if (state == UiState.OPTED_OUT) {
             Rect r = new Rect(baseX + PAD, baseY + PAD, OPT_BTN_SIZE, OPT_BTN_SIZE);
-            render2DUtil().roundRectFilled(ctx.getMatrices(), r.x, r.y, r.x + r.w, r.y + r.h, OPT_CORNER, Color.darkGray());
+            boolean hover = r.contains(mouseX, mouseY);
+            Color s = new Color(46, 46, 52, 220);
+            Color e = new Color(28, 28, 34, 220);
+            if (hover) {
+                s = new Color(56, 56, 64, 230);
+                e = new Color(34, 34, 42, 230);
+                render2DUtil().drawGlow(ctx, r.x, r.y, r.x + r.w, r.y + r.h, new Color(80, 110, 255, 90), OPT_CORNER);
+            }
+            fillRoundedGradient(ctx, r, OPT_CORNER, s, e, true);
             render2DUtil().drawTexture(ctx, TextureStorage.opt_in, r.x + 4, r.y + 4, r.x + r.w - 4, r.y + r.h - 4);
             return;
         }
 
         float barWidth = PAD + (BTN_SIZE * 3f) + (BTN_GAP * 2f) + PAD;
         Rect bar = new Rect(baseX, baseY + PAD, barWidth, BAR_HEIGHT);
-        render2DUtil().roundRectFilled(ctx.getMatrices(), bar.x, bar.y, bar.x + bar.w, bar.y + bar.h, BAR_CORNER, Color.darkGray());
+        boolean barHover = bar.contains(mouseX, mouseY);
+        Color s = new Color(40, 40, 46, 220);
+        Color e = new Color(22, 22, 28, 220);
+        if (barHover) {
+            s = new Color(50, 50, 58, 230);
+            e = new Color(28, 28, 36, 230);
+            render2DUtil().drawGlow(ctx, bar.x, bar.y, bar.x + bar.w, bar.y + bar.h, new Color(80, 110, 255, 90), BAR_CORNER);
+        }
+        fillRoundedGradient(ctx, bar, BAR_CORNER, s, e, false);
 
         float bx = bar.x + PAD;
         Rect tankRect = new Rect(bx, bar.y + PAD, BTN_SIZE, BTN_SIZE);
@@ -227,7 +248,10 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
 
         if (state != UiState.OPTED_OUT) {
             Rect out = new Rect(healRect.x + healRect.w - 1 + 4, bar.y - 4, OPT_OUT_SIZE, OPT_OUT_SIZE);
-            render2DUtil().roundRectFilled(ctx.getMatrices(), out.x, out.y, out.x + out.w, out.y + out.h, 2f, Color.gray());
+            boolean hover = out.contains(mouseX, mouseY);
+            Color os = hover ? new Color(70, 70, 78, 230) : new Color(64, 64, 72, 220);
+            Color oe = hover ? new Color(40, 40, 48, 230) : new Color(36, 36, 44, 220);
+            fillRoundedGradient(ctx, out, 2f, os, oe, true);
             render2DUtil().drawTexture(ctx, TextureStorage.opt_out, out.x + 1, out.y + 1, out.x + out.w - 1, out.y + out.h - 1);
         }
     }
@@ -236,6 +260,21 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         boolean active = Objects.equals(selectedRole, role);
         TexturePair tp = roleTextures.get(role);
         render2DUtil().drawTexture(ctx, active ? tp.active : tp.inactive, r.x, r.y, r.x + r.w, r.y + r.h);
+    }
+
+    String valueText(CappedValue v) {
+        if (v == null) return "0/0";
+        int c = (int) Math.round(v.current());
+        int m = (int) Math.round(v.max());
+        return c + "/" + m;
+    }
+
+    double valueRatio(CappedValue v) {
+        if (v == null) return 0d;
+        double max = v.max();
+        double val = v.current();
+        if (max <= 0d) return 0d;
+        return val / max;
     }
 
     @Override
