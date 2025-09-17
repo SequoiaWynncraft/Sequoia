@@ -125,33 +125,59 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         float baseY = renderY + renderedBorderYOffset + PAD;
 
         float iconH = 20f * SCALE;
-        float iconW = iconH * 2.5f;
+        float defaultIconW = iconH * 2.5f;
         float gap = 6f * SCALE;
 
         int lh = textRenderer().fontHeight;
-        float labelPad = lh + 2f;
+        float namePad = lh + 2f;
+        float valuePad = lh;
+
+        String oreVal = valueText(ore);
+        String fishVal = valueText(fish);
+        String woodVal = valueText(wood);
+        String cropVal = valueText(crop);
+
+        int maxTextW = Math.max(
+                Math.max(textRenderer().getWidth("Ore"), textRenderer().getWidth("Wood")),
+                Math.max(textRenderer().getWidth("Fish"), textRenderer().getWidth("Crops")));
+        maxTextW = Math.max(maxTextW, Math.max(
+                Math.max(textRenderer().getWidth(oreVal), textRenderer().getWidth(woodVal)),
+                Math.max(textRenderer().getWidth(fishVal), textRenderer().getWidth(cropVal))));
+
+        float iconW = Math.max(defaultIconW, maxTextW);
 
         float panelW = PAD + iconW + gap + iconW + PAD;
-        float panelH = PAD + labelPad + iconH + gap + labelPad + iconH + PAD;
+        float panelH = PAD + namePad + valuePad + iconH + gap + namePad + valuePad + iconH + PAD;
 
         render2DUtil().roundRectFilled(ctx.getMatrices(), baseX - panelW, baseY, baseX, baseY + panelH, 5f, Color.darkGray());
 
         float x1 = baseX - panelW + PAD;
         float x2 = x1 + iconW + gap;
-        float y1 = baseY + PAD + labelPad;
-        float y2 = y1 + iconH + gap + labelPad;
+        float y1 = baseY + PAD + namePad + valuePad;
+        float y2 = y1 + iconH + gap + namePad + valuePad;
 
-        render2DUtil().drawText(ctx, "Ore",  (int)(x1 + iconW / 2f - textRenderer().getWidth("Ore")  / 2f),  (int)(y1 - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, "Ore",  (int)(x1 + iconW / 2f - textRenderer().getWidth("Ore")  / 2f),  (int)(y1 - valuePad - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, oreVal, (int)(x1 + iconW / 2f - textRenderer().getWidth(oreVal) / 2f), (int)(y1 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x1, y1, iconW, iconH, valueRatio(ore), TextureStorage.ore_empty, TextureStorage.ore_full);
 
-        render2DUtil().drawText(ctx, "Fish", (int)(x2 + iconW / 2f - textRenderer().getWidth("Fish") / 2f), (int)(y1 - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, "Fish", (int)(x2 + iconW / 2f - textRenderer().getWidth("Fish") / 2f), (int)(y1 - valuePad - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, fishVal,(int)(x2 + iconW / 2f - textRenderer().getWidth(fishVal)/ 2f), (int)(y1 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x2, y1, iconW, iconH, valueRatio(fish), TextureStorage.fish_empty, TextureStorage.fish_full);
 
-        render2DUtil().drawText(ctx, "Wood", (int)(x1 + iconW / 2f - textRenderer().getWidth("Wood") / 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, "Wood", (int)(x1 + iconW / 2f - textRenderer().getWidth("Wood") / 2f), (int)(y2 - valuePad - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, woodVal,(int)(x1 + iconW / 2f - textRenderer().getWidth(woodVal)/ 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x1, y2, iconW, iconH, valueRatio(wood), TextureStorage.wood_empty, TextureStorage.wood_full);
 
-        render2DUtil().drawText(ctx, "Crops",(int)(x2 + iconW / 2f - textRenderer().getWidth("Crops")/ 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, "Crops",(int)(x2 + iconW / 2f - textRenderer().getWidth("Crops")/ 2f), (int)(y2 - valuePad - lh - 2), 0xFFFFFF, true);
+        render2DUtil().drawText(ctx, cropVal,(int)(x2 + iconW / 2f - textRenderer().getWidth(cropVal)/ 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x2, y2, iconW, iconH, valueRatio(crop), TextureStorage.crop_empty, TextureStorage.crop_full);
+    }
+
+    String valueText(CappedValue v) {
+        if (v == null) return "0/0";
+        int c = (int) Math.round(v.current());
+        int m = (int) Math.round(v.max());
+        return c + "/" + m;
     }
 
     void drawResourceMeter(DrawContext ctx, float x, float y, float w, float h, double ratio, Identifier emptyTex, Identifier fullTex) {
