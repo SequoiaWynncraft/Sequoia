@@ -1,11 +1,13 @@
 package star.sequoia2.utils.chatparser;
 
 import com.wynntils.utils.mc.McUtils;
+import star.sequoia2.accessors.EventBusAccessor;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.ws.message.ws.GGuildRaidWSMessage;
 import star.sequoia2.client.types.ws.message.ws.guildraid.GuildRaid;
 import star.sequoia2.client.types.ws.message.ws.guildraid.RaidType;
+import star.sequoia2.events.RaidCompleteFromChatEvent;
 import star.sequoia2.features.impl.ws.ChatHookFeature;
 import star.sequoia2.features.impl.ws.WebSocketFeature;
 
@@ -18,7 +20,7 @@ import java.util.regex.Pattern;
 import static star.sequoia2.features.impl.ws.ChatHookFeature.remove_formatting;
 import static star.sequoia2.utils.cache.SequoiaMemberCache.isSequoiaMember;
 
-public class GuildRaidParser implements FeaturesAccessor {
+public class GuildRaidParser implements FeaturesAccessor, EventBusAccessor {
     // \hover{<hoverText>}{<visible>}
     private static final Pattern HOVER = Pattern.compile("\\\\hover\\{([^}]*)}\\{([^}]*)}");
     // "<nick>'s real name is <user>"
@@ -97,7 +99,7 @@ public class GuildRaidParser implements FeaturesAccessor {
                     new GuildRaid(
                             type, players, reporter, aspects, emeralds, xp, sr
                     );
-
+            dispatch(new RaidCompleteFromChatEvent());
             if (features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)
                     || !features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isAuthenticated).orElse(false)) {
                 features().getIfActive(WebSocketFeature.class).map(webSocketFeature -> webSocketFeature.sendMessage(new GGuildRaidWSMessage(payload)));
