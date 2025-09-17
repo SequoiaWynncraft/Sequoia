@@ -10,7 +10,7 @@ import star.sequoia2.features.ToggleFeature;
 import static star.sequoia2.client.SeqClient.mc;
 
 public class EcoMessageFilter extends ToggleFeature {
-
+    // random comment
     public EcoMessageFilter() {
         super("EcoMessageFilter", "Filters eco messages in chat for Strat+");
     }
