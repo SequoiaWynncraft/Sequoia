@@ -11,7 +11,6 @@ import com.wynntils.services.map.pois.Poi;
 import com.wynntils.services.map.pois.TerritoryPoi;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.mc.KeyboardUtils;
-import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.render.MapRenderer;
 import com.wynntils.utils.render.RenderUtils;
 import com.wynntils.utils.type.BoundingBox;
@@ -24,12 +23,12 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.TextRendererAccessor;
-import star.sequoia2.client.SeqClient;
 import star.sequoia2.utils.render.TextureStorage;
 
 import java.util.*;
 
 import static com.wynntils.models.territories.type.GuildResource.*;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUtilAccessor, TextRendererAccessor {
     enum Roles { TANK, DPS, HEAL }
@@ -52,6 +51,9 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
 
     static final float OPT_OUT_SIZE = 20f * SCALE;
 
+    static final float CMD_BTN_SIZE = 42f * SCALE;
+    static final float CMD_CORNER = 5f * SCALE;
+
     static class Rect {
         final float x, y, w, h;
         Rect(float x, float y, float w, float h) { this.x = x; this.y = y; this.w = w; this.h = h; }
@@ -67,6 +69,7 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
 
     UiState state = UiState.OPTED_OUT;
     Roles selectedRole = null;
+    boolean commandActive = false;
 
     public BetterGuildMapScreen() {
         roleTextures.put(Roles.TANK, new TexturePair(TextureStorage.tank_active, TextureStorage.tank_inactive));
@@ -91,8 +94,30 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         renderPois(context.getMatrices(), mouseX, mouseY);
         RenderUtils.disableScissor(context);
 
-        drawRoleUi(context, mouseX, mouseY);
+        RenderSystem.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        MatrixStack m = context.getMatrices();
+        m.push();
+        m.translate(0, 0, 300);
+
+        drawRoleUI(context, mouseX, mouseY);
+        drawCommandUI(context, mouseX, mouseY);
         drawHqResourceUI(context, mouseX, mouseY);
+
+        m.pop();
+        RenderSystem.enableDepthTest();
+    }
+
+
+    void drawCommandUI(DrawContext ctx, int mouseX, int mouseY) {
+        float baseX = renderX + renderedBorderXOffset + mapWidth / 2f;
+        float baseY = renderY + renderedBorderYOffset + PAD;
+        Rect r = new Rect(baseX - CMD_BTN_SIZE / 2f, baseY, CMD_BTN_SIZE, CMD_BTN_SIZE);
+        render2DUtil().roundRectFilled(ctx.getMatrices(), r.x, r.y, r.x + r.w, r.y + r.h, CMD_CORNER, Color.darkGray());
+        Identifier tex = commandActive ? TextureStorage.command_active : TextureStorage.command_inactive;
+        render2DUtil().drawTexture(ctx, tex, r.x + 4, r.y + 4, r.x + r.w - 4, r.y + r.h - 4);
     }
 
     void drawHqResourceUI(DrawContext ctx, int mouseX, int mouseY) {
@@ -150,7 +175,7 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         return val / max;
     }
 
-    void drawRoleUi(DrawContext ctx, int mouseX, int mouseY) {
+    void drawRoleUI(DrawContext ctx, int mouseX, int mouseY) {
         float baseX = renderX + renderedBorderXOffset;
         float baseY = renderY + renderedBorderYOffset;
 
@@ -201,6 +226,13 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         float baseX = renderX + renderedBorderXOffset;
         float baseY = renderY + renderedBorderYOffset;
 
+        float cmdBaseX = renderX + renderedBorderXOffset + mapWidth / 2f;
+        Rect cmdRect = new Rect(cmdBaseX - CMD_BTN_SIZE / 2f, baseY + PAD, CMD_BTN_SIZE, CMD_BTN_SIZE);
+        if (cmdRect.contains(mouseX, mouseY)) {
+            commandActive = !commandActive;
+            return true;
+        }
+
         if (state == UiState.OPTED_OUT) {
             Rect optIn = new Rect(baseX + PAD, baseY + PAD, OPT_BTN_SIZE, OPT_BTN_SIZE);
             if (optIn.contains(mouseX, mouseY)) {
@@ -218,9 +250,11 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         Rect dpsRect = new Rect(bar.x + PAD + BTN_SIZE + BTN_GAP, bar.y + PAD, BTN_SIZE, BTN_SIZE);
         Rect healRect = new Rect(bar.x + PAD + (BTN_SIZE + BTN_GAP) * 2f, bar.y + PAD, BTN_SIZE, BTN_SIZE);
 
-        if (tankRect.contains(mouseX, mouseY)) { selectedRole = Roles.TANK; state = UiState.CHOSEN_ROLE; return true; }
-        if (dpsRect.contains(mouseX, mouseY)) { selectedRole = Roles.DPS; state = UiState.CHOSEN_ROLE; return true; }
-        if (healRect.contains(mouseX, mouseY)) { selectedRole = Roles.HEAL; state = UiState.CHOSEN_ROLE; return true; }
+        if (state == UiState.CHOOSING_ROLE) {
+            if (tankRect.contains(mouseX, mouseY)) { selectedRole = Roles.TANK; state = UiState.CHOSEN_ROLE; return true; }
+            if (dpsRect.contains(mouseX, mouseY)) { selectedRole = Roles.DPS; state = UiState.CHOSEN_ROLE; return true; }
+            if (healRect.contains(mouseX, mouseY)) { selectedRole = Roles.HEAL; state = UiState.CHOSEN_ROLE; return true; }
+        }
 
         if (state != UiState.OPTED_OUT) {
             Rect out = new Rect(healRect.x + healRect.w - 1 + 4, bar.y - 4, OPT_OUT_SIZE, OPT_OUT_SIZE);
@@ -316,8 +350,6 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
 
         List<Poi> filteredPois = getRenderedPois(pois, textureBoundingBox, poiScale, mouseX, mouseY);
 
-        // Render trading routes
-        // We render them in both directions because optimizing it is not cheap either
         for (Poi poi : filteredPois) {
             if (!(poi instanceof TerritoryPoi territoryPoi)) continue;
 
@@ -329,7 +361,6 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
                         .filter(filteredPoi -> filteredPoi.getName().equals(tradingRoute))
                         .findFirst();
 
-                // Only render connection if the other poi is also in the filtered pois
                 if (routePoi.isPresent() && filteredPois.contains(routePoi.get())) {
                     float x = MapRenderer.getRenderX(routePoi.get(), mapCenterX, centerX, zoomRenderScale);
                     float z = MapRenderer.getRenderZ(routePoi.get(), mapCenterZ, centerZ, zoomRenderScale);
@@ -339,9 +370,8 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
             }
         }
 
-        VertexConsumerProvider.Immediate bufferSource = McUtils.mc().getBufferBuilders().getEntityVertexConsumers();
+        VertexConsumerProvider.Immediate bufferSource = mc.getBufferBuilders().getEntityVertexConsumers();
 
-        // Reverse and Render
         for (int i = filteredPois.size() - 1; i >= 0; i--) {
             Poi poi = filteredPois.get(i);
 

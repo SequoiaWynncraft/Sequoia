@@ -171,21 +171,9 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
         features.add(new EcoMessageFilter());
-        //features.add(new BetterGuildMap());
+        features.add(new BetterGuildMap());
         if (Seq.isHasMCEF()) {
             //features.add(new CustomChat());
-        }
-    }
-
-    public static Supplier<Settings> clientModule = Suppliers
-            .memoize(() -> features.get(Settings.class)
-                    .orElseThrow(() -> new IllegalStateException("Settings feature was not registered")));
-
-    public static void reloadConfiguration() {
-        try {
-            configuration = new Configuration();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to reload configuration", e);
         }
     }
 
@@ -200,13 +188,6 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         return teXParser.parseMutableText("\\pill{%s}{%s}{Sequoia} \\+{»} ",
                 Integer.toHexString(features.get(Settings.class).map(settingsFeature -> settingsFeature.getTheme().get().getTheme().DARK).orElse(0x6600cc)),
                 Integer.toHexString(features.get(Settings.class).map(settingsFeature -> settingsFeature.getTheme().get().getTheme().LIGHT).orElse(0xf3e6ff))).append(text);
-//        return Text.empty()
-//                .append(Text.literal("SequoiaMod")
-//                        .styled(selectedTheme.normal()))
-//                .append(Text.literal(" » ")
-//                        .styled(selectedTheme.dark()))
-//                .append(Text.empty()
-//                        .styled(selectedTheme.light())).append(text);
     }
 
     public static File getModStorageDir(String dirName) {
