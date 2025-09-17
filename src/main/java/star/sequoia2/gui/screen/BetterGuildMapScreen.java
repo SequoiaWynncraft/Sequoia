@@ -23,6 +23,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import star.sequoia2.accessors.RenderUtilAccessor;
+import star.sequoia2.accessors.TextRendererAccessor;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.utils.render.TextureStorage;
 
@@ -30,7 +31,7 @@ import java.util.*;
 
 import static com.wynntils.models.territories.type.GuildResource.*;
 
-public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUtilAccessor {
+public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUtilAccessor, TextRendererAccessor {
     enum Roles { TANK, DPS, HEAL }
     enum UiState { OPTED_OUT, CHOOSING_ROLE, CHOSEN_ROLE }
 
@@ -102,19 +103,29 @@ public class BetterGuildMapScreen extends AbstractMapScreen implements RenderUti
         float iconW = iconH * 2.5f;
         float gap = 6f * SCALE;
 
+        int lh = textRenderer().fontHeight;
+        float labelPad = lh + 2f;
+
         float panelW = PAD + iconW + gap + iconW + PAD;
-        float panelH = PAD + iconH + gap + iconH + PAD;
+        float panelH = PAD + labelPad + iconH + gap + labelPad + iconH + PAD;
 
         render2DUtil().roundRectFilled(ctx.getMatrices(), baseX - panelW, baseY, baseX, baseY + panelH, 5f, Color.darkGray());
 
         float x1 = baseX - panelW + PAD;
         float x2 = x1 + iconW + gap;
-        float y1 = baseY + PAD;
-        float y2 = y1 + iconH + gap;
+        float y1 = baseY + PAD + labelPad;
+        float y2 = y1 + iconH + gap + labelPad;
 
+        render2DUtil().drawText(ctx, "Ore",  (int)(x1 + iconW / 2f - textRenderer().getWidth("Ore")  / 2f),  (int)(y1 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x1, y1, iconW, iconH, valueRatio(ore), TextureStorage.ore_empty, TextureStorage.ore_full);
+
+        render2DUtil().drawText(ctx, "Fish", (int)(x2 + iconW / 2f - textRenderer().getWidth("Fish") / 2f), (int)(y1 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x2, y1, iconW, iconH, valueRatio(fish), TextureStorage.fish_empty, TextureStorage.fish_full);
+
+        render2DUtil().drawText(ctx, "Wood", (int)(x1 + iconW / 2f - textRenderer().getWidth("Wood") / 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x1, y2, iconW, iconH, valueRatio(wood), TextureStorage.wood_empty, TextureStorage.wood_full);
+
+        render2DUtil().drawText(ctx, "Crops",(int)(x2 + iconW / 2f - textRenderer().getWidth("Crops")/ 2f), (int)(y2 - lh - 2), 0xFFFFFF, true);
         drawResourceMeter(ctx, x2, y2, iconW, iconH, valueRatio(crop), TextureStorage.crop_empty, TextureStorage.crop_full);
     }
 
