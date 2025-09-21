@@ -11,21 +11,15 @@ import com.wynntils.handlers.container.scriptedquery.ScriptedContainerQuery;
 import com.wynntils.handlers.container.type.ContainerContent;
 import com.wynntils.models.containers.ContainerModel;
 import com.wynntils.utils.mc.LoreUtils;
-import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.wynn.InventoryUtils;
 import lombok.Getter;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.client.SeqClient;
-import star.sequoia2.events.PacketEvent;
 import star.sequoia2.events.RaidCompleteFromChatEvent;
 import star.sequoia2.features.ToggleFeature;
 import star.sequoia2.settings.types.BooleanSetting;
-import star.sequoia2.settings.types.FloatSetting;
 import star.sequoia2.settings.types.IntSetting;
 import star.sequoia2.utils.wynn.WynnUtils;
 
@@ -35,11 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static star.sequoia2.client.SeqClient.mc;
-
 public class GuildRewardTrackingFeature extends ToggleFeature {
-    private boolean rewardsDone = false;
-    private boolean isRunning = false;
     private static final int GUILD_REWARDS_ITEM_SLOT = 27;
     private static final Pattern GUILD_REWARDS_EMERALDS_PATTERN = Pattern.compile("^§aEmeralds: §f(\\d+)§7/(\\d+)$");
     private static final Pattern GUILD_REWARDS_TOMES_PATTERN = Pattern.compile("^§5Guild Tomes: §f(\\d+)§7/(\\d+)$");
@@ -80,8 +70,8 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
         });
         }
     }*/
-@Subscribe
-public void onRaidComp(RaidCompleteFromChatEvent event){
+    @Subscribe
+    public void onRaidComp(RaidCompleteFromChatEvent event){
         processGuildRewards();
     }
 
@@ -98,16 +88,13 @@ public void onRaidComp(RaidCompleteFromChatEvent event){
                     int aspectValue = (aspects.first * 100 / aspects.second);
                     int tomeValue = (tomes.first * 100 / tomes.second);
                     if (emeraldValue >= emeraldNotifyValue.get()) {
-                        McUtils.sendMessageToClient(SeqClient.prefix(
-                                Text.of("Emeralds are above value of : " + emeraldNotifyValue.get() + "%")));
+                        SeqClient.info("Emeralds are above value of : " + emeraldNotifyValue.get() + "%");
                     }
                     if (aspectValue >= aspectNotifyValue.get()) {
-                        McUtils.sendMessageToClient(SeqClient.prefix(
-                                Text.of("Aspects are above value of : " + aspectNotifyValue.get() + "%")));
+                        SeqClient.info("Aspects are above value of : " + aspectNotifyValue.get() + "%");
                     }
                     if (tomeValue >= tomeNotifyValue.get()) {
-                        McUtils.sendMessageToClient(SeqClient.prefix(
-                                Text.of("Tomes are above value of : " + tomeNotifyValue.get() + "%")));
+                        SeqClient.info("Tomes are above value of : " + tomeNotifyValue.get() + "%");
                     }
 /*                   Managers.TickScheduler.scheduleLater( todo: ignore
                            () -> {
