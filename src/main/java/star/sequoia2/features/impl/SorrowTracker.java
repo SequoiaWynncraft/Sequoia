@@ -11,13 +11,17 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import star.sequoia2.accessors.RenderUtilAccessor;
+import star.sequoia2.accessors.TextRendererAccessor;
 import star.sequoia2.events.PacketEvent;
 import star.sequoia2.events.Render2DEvent;
 import star.sequoia2.events.Render3DEvent;
+import star.sequoia2.events.input.KeyEvent;
 import star.sequoia2.features.ToggleFeature;
+import star.sequoia2.settings.Binding;
 import star.sequoia2.settings.types.BooleanSetting;
 import star.sequoia2.settings.types.ColorSetting;
 import star.sequoia2.settings.types.FloatSetting;
+import star.sequoia2.settings.types.KeybindSetting;
 import star.sequoia2.utils.Timer;
 import star.sequoia2.utils.render.TextureStorage;
 
@@ -25,12 +29,19 @@ import java.awt.*;
 
 import static star.sequoia2.client.SeqClient.mc;
 
-public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor {
+public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor, TextRendererAccessor {
 
     BooleanSetting renderCustom = settings().bool("Render", "to render custom sorrow or not", false);
     BooleanSetting renderTimer = settings().bool("RenderTimer", "to render custom sorrow timer or not", true);
 
+    FloatSetting xOffset = settings().number("XOffset", "Horizontal offset for sorrow timer", 0f, -500f, 500f);
+    FloatSetting yOffset = settings().number("YOffset", "Vertical offset for sorrow timer", 0f, -500f, 500f);
+    FloatSetting scale = settings().number("Scale", "Scale of the sorrow timer text", 1.0f, 0.5f, 5.0f);
+
     ColorSetting color = settings().color("Color", "color of the sorrow", new mil.nga.color.Color(255, 0, 0));
+
+    BooleanSetting useBind = settings().bool("UseBind", "Wether to check for bind used", true);
+    KeybindSetting keybind = settings().binding("SorrowBind", "Bind for detecting sorrow", Binding.none());
 
     BooleanSetting sneak = settings().bool("CheckSneaking", "toggle to check sneaking to detect sorrow", false);
 
@@ -57,10 +68,39 @@ public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor {
     }
 
     @Subscribe
+    public void onKeyDown(KeyEvent event) {
+        if (!useBind.get()) return;
+        if (event.isKeyDown() && keybind.get().matches(event) && mc.currentScreen == null && (!sneak.get() || mc.player != null && mc.player.isSneaking())) {
+            event.cancel();
+            sorrowTimer.reset();
+        }
+    }
+
+    @Subscribe
     public void onRender2D(Render2DEvent event) {
         if (mc.player == null || mc.world == null || !renderTimer.get()) return;
         if (sorrowTimer.passed((long) ((delay.get() + duration.get()) * 1000L)) || !sorrowTimer.passed((long) (delay.get() * 1000L))) return;
 
+        long elapsed = sorrowTimer.getPassed();
+        long endMs = (long) ((delay.get() + duration.get()) * 1000L);
+        long remainMs = Math.max(0L, endMs - elapsed);
+        float secs = remainMs / 1000f;
+
+        String text = String.format("%.1f", secs);
+        int w = mc.getWindow().getScaledWidth();
+        int h = mc.getWindow().getScaledHeight();
+        int tw = textRenderer().getWidth(text);
+        int packed = new Color(color.get().getRed(), color.get().getGreen(), color.get().getBlue(), color.get().getAlpha()).getRGB();
+
+        float x = (w - tw) / 2f + xOffset.get();
+        float y = h / 2f - 4 + yOffset.get();
+
+        MatrixStack matrices = event.context().getMatrices();
+        matrices.push();
+        float s = scale.get();
+        matrices.scale(s, s, 1f);
+        render2DUtil().drawText(event.context(), text, x / s, y / s, packed, true);
+        matrices.pop();
     }
 
     @Subscribe
