@@ -62,7 +62,7 @@ public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor, 
 
     @Subscribe
     public void onPacketReceive(PacketEvent.PacketReceiveEvent event) {
-        if (mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value().id().equals(SoundEvents.ENTITY_WITHER_SHOOT.id()) && (!sneak.get() || mc.player.isSneaking())) {
+        if (!useBind.get() &&mc.player != null && event.packet() instanceof PlaySoundS2CPacket soundPacket && soundPacket.getSound().value().id().equals(SoundEvents.ENTITY_WITHER_SHOOT.id()) && (!sneak.get() || mc.player.isSneaking())) {
             sorrowTimer.reset();
         }
     }
