@@ -71,7 +71,6 @@ public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor, 
     public void onKeyDown(KeyEvent event) {
         if (!useBind.get()) return;
         if (event.isKeyDown() && keybind.get().matches(event) && mc.currentScreen == null && (!sneak.get() || mc.player != null && mc.player.isSneaking())) {
-            event.cancel();
             sorrowTimer.reset();
         }
     }
