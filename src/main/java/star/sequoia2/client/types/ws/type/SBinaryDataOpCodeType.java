@@ -6,7 +6,7 @@ public enum SBinaryDataOpCodeType {
     FILE_TRANSFER_START,
     FILE_TRANSFER_DATA,
     FILE_TRANSFER_END,
-    // Client to server
+    // Settings to server
     FILE_TRANSFER_READY,
     FILE_TRANSFER_ACK;
 

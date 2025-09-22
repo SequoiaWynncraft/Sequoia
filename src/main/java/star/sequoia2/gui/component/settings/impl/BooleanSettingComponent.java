@@ -22,7 +22,7 @@ public class BooleanSettingComponent extends SettingComponent<Boolean> implement
         float top = contentY();
 
         float horizontalPos = left + textRenderer().getWidth(setting.name) + getGuiRoot().pad;
-        float verticalPos = top + (textRenderer().fontHeight / 4f);
+        float verticalPos = top + textRenderer().fontHeight * 0.1f;
 
         Color light = features().get(Settings.class).map(Settings::getThemeLight).orElse(Color.black());
         Color dark = features().get(Settings.class).map(Settings::getThemeDark).orElse(Color.black());
@@ -31,6 +31,7 @@ public class BooleanSettingComponent extends SettingComponent<Boolean> implement
         boolean on = Boolean.TRUE.equals(setting.get());
         Color start = on ? accent2 : dark;
 
+        render2DUtil().drawGlow(context, horizontalPos, verticalPos, horizontalPos + 5f, verticalPos + 5f, start, 2.5f);
         render2DUtil().roundRectFilled(context.getMatrices(), horizontalPos, verticalPos, horizontalPos + 5f, verticalPos + 5f, 2.5f, start);
 
         renderText(context, setting.name, left, top, light.getColor());

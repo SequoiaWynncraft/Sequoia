@@ -8,6 +8,7 @@ public final class TextureStorage {
     public static Identifier icon = Identifier.of("seq", "icon.png");
     public static Identifier icon_dark = Identifier.of("seq", "icondark.png");
     public static Identifier bars = Identifier.of("seq", "textures/player_info_bars.png");
+    public static Identifier cogs = Identifier.of("seq", "textures/cogs.png");
 
     //map
     public static Identifier command_active = Identifier.of("seq", "textures/map/command_active.png");

@@ -3,8 +3,6 @@ package star.sequoia2.client;
 import com.collarmc.pounce.EventBus;
 import com.collarmc.pounce.Preference;
 import com.collarmc.pounce.Subscribe;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
 import com.wynntils.utils.mc.McUtils;
 import lombok.Getter;
@@ -115,7 +113,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
             throw new IllegalStateException("could not read configuration", e);
         }
 
-        SEQUOIA_FOLDER = new File(McUtils.mc().runDirectory, "sequoia");
+        SEQUOIA_FOLDER = new File(mc.runDirectory, "sequoia");
 
         //Static init no need for instance in this case
         Threading tInit = new Threading();
@@ -165,7 +163,7 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
     private void registerFeatures() {
         features.add(new Settings()); // always first so you can get colors
-        features.add(new SorrowRender());
+        features.add(new SorrowTracker());
         features.add(new PartyHealthDisplay());
         features.add(new ChatHookFeature());
         features.add(new DiscordChatBridgeFeature());

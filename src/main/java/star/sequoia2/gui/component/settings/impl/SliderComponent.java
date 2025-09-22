@@ -82,12 +82,13 @@ public class SliderComponent<T extends Number> extends SettingComponent<T> imple
             animatedFill = MathHelper.clamp(animatedFill, 0f, 1f);
 
             float fillX2 = trackX1 + (trackX2 - trackX1) * animatedFill;
-            render2DUtil().roundRectFilled(context.getMatrices(), trackX1, trackY1, fillX2, trackY1 + trackH, trackH / 2f, accent2);
+            render2DUtil().roundRectFilled(context.getMatrices(), trackX1, trackY1, fillX2, trackY1 + trackH, trackH / 2f, new Color(accent2.getRed(), accent2.getGreen(), accent2.getBlue(), 150));
 
             float knobW = Math.max(fontH * 0.8f, 6f);
             float knobH = Math.max(fontH * 0.9f, trackH + 4f);
             float knobX1 = MathHelper.clamp(fillX2 - knobW / 2f, trackX1, trackX2 - knobW);
             float knobY1 = top + (fontH - knobH) / 2f;
+            render2DUtil().drawGlow(context, knobX1, knobY1, knobX1 + knobW, knobY1 + knobH, accent2, knobH / 2f);
             render2DUtil().roundRectFilled(context.getMatrices(), knobX1, knobY1, knobX1 + knobW, knobY1 + knobH, knobH / 2f, accent2);
 
             if (dragging && !isListening) {

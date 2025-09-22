@@ -2,7 +2,6 @@ package star.sequoia2.features.impl;
 
 import com.collarmc.pounce.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.floats.FloatSet;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.events.PacketEvent;
+import star.sequoia2.events.Render2DEvent;
 import star.sequoia2.events.Render3DEvent;
 import star.sequoia2.features.ToggleFeature;
 import star.sequoia2.settings.types.BooleanSetting;
@@ -25,20 +25,25 @@ import java.awt.*;
 
 import static star.sequoia2.client.SeqClient.mc;
 
-public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
+public class SorrowTracker extends ToggleFeature implements RenderUtilAccessor {
+
+    BooleanSetting renderCustom = settings().bool("Render", "to render custom sorrow or not", false);
+    BooleanSetting renderTimer = settings().bool("RenderTimer", "to render custom sorrow timer or not", true);
 
     ColorSetting color = settings().color("Color", "color of the sorrow", new mil.nga.color.Color(255, 0, 0));
 
     BooleanSetting sneak = settings().bool("CheckSneaking", "toggle to check sneaking to detect sorrow", false);
 
     FloatSetting duration = settings().number("Duration", "Duration of the sorrow seconds", 1.6f, 0.1f, 20f);
-    FloatSetting delay = settings().number("Delay", "Delay before sorrow starts seconds", 1.6f, 0.1f, 20f);
+    FloatSetting delay = settings().number("Delay", "Delay before sorrow starts seconds", 1.0f, 0.1f, 20f);
 
     private final Timer timer;
     private final Timer sorrowTimer;
 
-    public SorrowRender() {
-        super("SorrowRender", "Custom visuals for blood sorrow");
+    private boolean shouldRender = false;
+
+    public SorrowTracker() {
+        super("SorrowTracker", "Custom visuals for blood sorrow");
         timer = new Timer();
         sorrowTimer = new Timer();
         timer.reset();
@@ -52,8 +57,15 @@ public class SorrowRender extends ToggleFeature implements RenderUtilAccessor {
     }
 
     @Subscribe
+    public void onRender2D(Render2DEvent event) {
+        if (mc.player == null || mc.world == null || !renderTimer.get()) return;
+        if (sorrowTimer.passed((long) ((delay.get() + duration.get()) * 1000L)) || !sorrowTimer.passed((long) (delay.get() * 1000L))) return;
+
+    }
+
+    @Subscribe
     public void onRender3D(Render3DEvent event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null || !renderCustom.get()) return;
         if (sorrowTimer.passed((long) ((delay.get() + duration.get()) * 1000L)) || !sorrowTimer.passed((long) (delay.get() * 1000L))) return;
 
         float delta = render3DUtil().getTickDelta();

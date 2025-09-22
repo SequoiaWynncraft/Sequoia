@@ -1,7 +1,6 @@
 package star.sequoia2.gui.screen;
 
 import lombok.Getter;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.accessors.RenderUtilAccessor;
@@ -64,12 +63,16 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         Color accent2 = features().get(Settings.class).map(Settings::getThemeAccent2).orElse(Color.black());
         Color accent3 = features().get(Settings.class).map(Settings::getThemeAccent3).orElse(Color.black());
 
+        float menuW = btnW + pad * 2f + 20f;
+
+        render2DUtil().drawGlow(context, bx, by, bx + boxWidth, by + boxHeight, dark, rounding);
+
         render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, dark, false);
 
         matrices.push();
-        render2DUtil().enableScissor((int) bx, (int) by, (int) (bx + btnW + pad * 2), (int) (by + boxHeight));
+        context.enableScissor((int) bx, (int) by, (int) (bx + menuW), (int) (by + boxHeight));
         render2DUtil().roundGradientFilled(matrices, bx, by, bx + boxWidth, by + boxHeight, rounding, dark, normal, false);
-        render2DUtil().disableScissor();
+        context.disableScissor();
         matrices.pop();
 
         render2DUtil().drawTexture(context, TextureStorage.icon, bx + pad, by + pad, bx + pad + btnW, by + pad + btnW);
@@ -77,39 +80,59 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;
 
+        int settingsIdx = -1;
         for (int i = 0; i < categories.size(); i++) {
+            if ("Settings".equals(categories.get(i).name)) {
+                settingsIdx = i;
+                break;
+            }
+        }
+
+        int drawIdx = 0;
+        for (int i = 0; i < categories.size(); i++) {
+            if (i == settingsIdx) continue;
             RelativeComponent c = categories.get(i);
-            float byTop = listY + i * (btnH + btnGap);
+            float byTop = listY + drawIdx * (btnH + btnGap);
             boolean hover = mouseX >= listX && mouseX <= listX + btnW && mouseY >= byTop && mouseY <= byTop + btnH;
 
-            Color start, end;
-            if (i == selected) {
-                start = accent1;
-                end = accent2;
-            } else if (hover) {
-                start = light;
-                end = normal;
-            } else {
-                start = dark;
-                end = dark;
+            int textWidth = textRenderer().getWidth(c.name);
+            float dynamicBtnW = Math.max(btnW, textWidth + pad * 2f);
+
+            if (hover) {
+                render2DUtil().roundRectFilled(matrices, listX, byTop, listX + dynamicBtnW, byTop + btnH, rounding, new Color(dark.getRed(), dark.getGreen(), dark.getBlue(), 50));
             }
 
-            render2DUtil().roundGradientFilled(matrices, listX, byTop, listX + btnW, byTop + btnH, rounding, start, end, true);
-
-            int textWidth = textRenderer().getWidth(c.name);
-            float textX = listX + (btnW - textWidth) / 2f;
+            float textX = listX + pad;
             float textY = byTop + (btnH - textRenderer().fontHeight) / 2f;
 
             Color glowColor = accent2;
 
             if (i == selected) {
-                render2DUtil().drawGlow(context, listX, byTop, listX + btnW, byTop + btnH, glowColor, rounding);
+                render2DUtil().drawGlow(context, listX, byTop, listX + dynamicBtnW, byTop + btnH, glowColor, rounding);
             }
 
-            context.drawText(textRenderer(), c.name, (int) textX, (int) textY, light.getColor(), true);
+            context.drawText(textRenderer(), c.name, (int) textX, (int) textY - (hover ? 1 : 0), light.getColor(), true);
+            drawIdx++;
         }
 
-        float contentX = bx + pad + btnW + pad * 2;
+        if (settingsIdx != -1) {
+            float settingsX = listX;
+            float settingsY = by + boxHeight - pad - btnW;
+            boolean hoverSettings = mouseX >= settingsX && mouseX <= settingsX + btnW && mouseY >= settingsY && mouseY <= settingsY + btnW;
+
+            Color sStart;
+            if (selected == settingsIdx) {
+                sStart = accent2;
+            } else if (hoverSettings) {
+                sStart = accent1;
+            } else {
+                sStart = light;
+            }
+
+            render2DUtil().drawTextureColored(context, TextureStorage.cogs, settingsX, settingsY, settingsX + btnW, settingsY + btnW, new java.awt.Color(sStart.getRed(), sStart.getGreen(), sStart.getBlue(), sStart.getAlpha()).getRGB());
+        }
+
+        float contentX = bx + menuW + pad;
         float contentY = by + pad;
         float contentW = boxWidth - (contentX - bx) - pad;
         float contentH = boxHeight - pad * 2f;
@@ -137,10 +160,30 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;
 
+        int settingsIdx = -1;
         for (int i = 0; i < categories.size(); i++) {
-            float byTop = listY + i * (btnH + btnGap);
+            if ("Settings".equals(categories.get(i).name)) {
+                settingsIdx = i;
+                break;
+            }
+        }
+
+        int drawIdx = 0;
+        for (int i = 0; i < categories.size(); i++) {
+            if (i == settingsIdx) continue;
+            float byTop = listY + drawIdx * (btnH + btnGap);
             if (mouseX >= listX && mouseX <= listX + btnW && mouseY >= byTop && mouseY <= byTop + btnH) {
                 selected = i;
+                return;
+            }
+            drawIdx++;
+        }
+
+        if (settingsIdx != -1) {
+            float settingsX = listX;
+            float settingsY = by + boxHeight - pad - btnW;
+            if (mouseX >= settingsX && mouseX <= settingsX + btnW && mouseY >= settingsY && mouseY <= settingsY + btnW) {
+                selected = settingsIdx;
                 return;
             }
         }

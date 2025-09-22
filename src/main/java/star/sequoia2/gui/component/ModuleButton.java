@@ -5,13 +5,13 @@ import star.sequoia2.accessors.ConfigurationAccessor;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.SettingsAccessor;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.component.settings.SettingComponent;
 import star.sequoia2.gui.component.settings.impl.*;
 import star.sequoia2.gui.screen.GuiRoot;
 import star.sequoia2.features.Feature;
 import star.sequoia2.features.ToggleFeature;
-import star.sequoia2.features.impl.Settings;
 import star.sequoia2.settings.Setting;
 import lombok.Getter;
 import mil.nga.color.Color;
@@ -114,7 +114,7 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
                 settingComp.setDimensions(contentWidth() - root.pad * 2f, root.btnH * 0.8f);
                 settingComp.render(context, mouseX, mouseY, delta);
                 if (settingComp instanceof ColorSettingComponent colorSettingComponent && colorSettingComponent.isOpen()) {
-                    settingComp.setDimensions(contentWidth() - root.pad * 2f, root.btnH * 0.8f + colorSettingComponent.getPickerHeight());
+                    settingComp.setDimensions(contentWidth() - root.pad * 2f, root.pad + colorSettingComponent.getPickerHeight());
                 }
                 offsetY += settingComp.contentHeight() + root.btnGap * 0.5f;
             }

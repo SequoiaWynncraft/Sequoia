@@ -411,6 +411,14 @@ public class Render2DUtil implements TextRendererAccessor {
         matrices.pop();
     }
 
+    public void drawTextureColored(DrawContext context, Identifier texture, float x, float y, float x2, float y2, int color) {
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(x, y, 0);
+        context.drawTexture(RenderLayer::getGuiTextured , texture, 0, 0, 0f, 0f, (int) (x2 - x), (int) (y2 - y), (int) (x2 - x), (int) (y2 - y), color);
+        matrices.pop();
+    }
+
     private static float[] lerpColor(int startARGB, int endARGB, float t) {
         t = Math.max(0f, Math.min(1f, t));
         int a0 = (startARGB >>> 24) & 0xFF, r0 = (startARGB >>> 16) & 0xFF, g0 = (startARGB >>> 8) & 0xFF, b0 = (startARGB) & 0xFF;

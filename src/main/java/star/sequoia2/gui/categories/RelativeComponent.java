@@ -1,6 +1,5 @@
 package star.sequoia2.gui.categories;
 
-import org.lwjgl.glfw.GLFW;
 import star.sequoia2.accessors.FeaturesAccessor;
 import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.component.InteractableComponent;

@@ -41,15 +41,15 @@ public record Binding(int key, int button) {
     }
 
     public boolean matches(KeyEvent event) {
-        return key == event.key();
+        return key > -1 && key == event.key();
     }
 
     public boolean matches(MouseButtonEvent event) {
-        return button == event.button();
+        return button > -1 && button == event.button();
     }
 
     public boolean isSet() {
-        return button == -1 || key == -1;
+        return key > -1 || button > -1;
     }
 
     public String name() {

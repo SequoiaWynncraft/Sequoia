@@ -5,9 +5,9 @@ import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import star.sequoia2.accessors.RenderUtilAccessor;
 import star.sequoia2.accessors.TextRendererAccessor;
+import star.sequoia2.features.impl.Settings;
 import star.sequoia2.gui.categories.RelativeComponent;
 import star.sequoia2.gui.screen.GuiRoot;
-import star.sequoia2.features.impl.Settings;
 import org.lwjgl.glfw.GLFW;
 
 import static star.sequoia2.client.SeqClient.mc;

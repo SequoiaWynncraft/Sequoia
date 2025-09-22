@@ -9,7 +9,6 @@ import star.sequoia2.gui.component.settings.SettingComponent;
 import star.sequoia2.settings.Setting;
 import star.sequoia2.settings.types.CalculatedEnumSetting;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class CalculatedEnumSettingComponent extends SettingComponent<String> implements RenderUtilAccessor {

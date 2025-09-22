@@ -52,7 +52,8 @@ public class Notifications implements FeaturesAccessor {
         var signature = prefix.toString() != null ? new MessageSignatureData(createSignature(Text.literal("[Seq] ").withColor(color).toString() + sig)) : null;
 
 //        ((IChatHud) mc.inGameHud.getChatHud()).seq$remove(signature);
-        ((IChatHud) mc.inGameHud.getChatHud()).seq$invokeAddMessage(prefix, signature, MessageIndicator.system());
+//        ((IChatHud) mc.inGameHud.getChatHud()).seq$invokeAddMessage(prefix, signature, MessageIndicator.system());
+        SeqClient.info(message.toString());
     }
 
 

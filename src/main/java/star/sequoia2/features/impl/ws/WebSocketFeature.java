@@ -318,38 +318,6 @@ public class WebSocketFeature extends ToggleFeature {
 
     }
 
-//    @SubscribeEvent(priority = EventPriority.HIGHEST)
-//    public void onCharacterUpdate(CharacterUpdateEvent event) {
-//        if (!isEnabled()) {
-//            return;
-//        }
-//
-//        WynnUtils.isSequoiaGuildMember().whenComplete((isSequoiaGuildMember, throwable) -> {
-//            if (throwable != null) {
-//                SequoiaMod.error("Failed to check if player is a Sequoia guild member", throwable);
-//                return;
-//            }
-//
-//            if (!isSequoiaGuildMember) {
-//                return;
-//            }
-//
-//            WebSocketFeature webSocketFeature = SequoiaMod.getWebSocketFeature();
-//            if (webSocketFeature == null || !webSocketFeature.isEnabled()) {
-//                return;
-//            }
-//
-//            AccessTokenManagerUpfixer.fixLegacyFilesIfNeeded();
-//
-//            try {
-//                webSocketFeature.initClient();
-//                webSocketFeature.connectIfNeeded();
-//            } catch (RuntimeException exception) {
-//                SequoiaMod.error("Failed to connect to WebSocket server: " + exception.getMessage());
-//            }
-//        });
-//    }
-
     @Override
     public void onDeactivate() {
         closeIfNeeded();
