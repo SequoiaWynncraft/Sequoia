@@ -24,6 +24,8 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
     private float x, y;
     private float w, h;
 
+    private boolean iconDark;
+
     public final float boxHeight = features().get(Settings.class).map(settings -> settings.getBoxH().get()).orElse(300f);
     public final float boxWidth = features().get(Settings.class).map(settings -> settings.getBoxW().get()).orElse(380f);
     public final float pad = features().get(Settings.class).map(settings -> settings.getPad().get()).orElse(5f);
@@ -75,7 +77,7 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
         context.disableScissor();
         matrices.pop();
 
-        render2DUtil().drawTexture(context, TextureStorage.icon, bx + pad, by + pad, bx + pad + btnW, by + pad + btnW);
+        render2DUtil().drawTexture(context, iconDark ? TextureStorage.icon_dark : TextureStorage.icon, bx + pad, by + pad, bx + pad + btnW, by + pad + btnW);
 
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;
@@ -156,6 +158,13 @@ public final class GuiRoot implements RenderUtilAccessor, TextRendererAccessor, 
     public void mouseClicked(float mouseX, float mouseY, int button) {
         float bx = (uiW - boxWidth) / 2f;
         float by = (uiH - boxHeight) / 2f;
+
+        float ix = bx + pad;
+        float iy = by + pad;
+        if (mouseX >= ix && mouseX <= ix + btnW && mouseY >= iy && mouseY <= iy + btnW) {
+            iconDark = !iconDark;
+            return;
+        }
 
         float listX = bx + pad;
         float listY = by + btnW + pad * 2;
