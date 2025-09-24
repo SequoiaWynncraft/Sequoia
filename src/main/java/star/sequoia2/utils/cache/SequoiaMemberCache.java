@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static star.sequoia2.client.SeqClient.mc;
+
 /**
  * Caches Sequoia (SEQ) guild members as {uuid, username} pairs.
  * - Pulls members via Wynncraft Guild(Name) with identifier=uuid
@@ -38,7 +40,7 @@ public final class SequoiaMemberCache {
     private static final String MOJANG_SESSION_URL =
             "https://sessionserver.mojang.com/session/minecraft/profile/";
 
-    private static final Path FILE = MinecraftClient.getInstance().runDirectory
+    private static final Path FILE = mc.runDirectory
             .toPath().resolve("sequoia/cache/sequoia_members.json");
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

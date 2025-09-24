@@ -19,6 +19,7 @@ import star.sequoia2.utils.wynn.WynnUtils;
 import java.util.regex.Pattern;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
+import static star.sequoia2.client.SeqClient.mc;
 
 public class AuthCommand extends Command implements FeaturesAccessor {
     private static final Pattern CODE_PATTERN = Pattern.compile("[a-z0-9]{64}");
@@ -51,7 +52,7 @@ public class AuthCommand extends Command implements FeaturesAccessor {
             }
 
             WynnUtils.isSequoiaGuildMember()
-                    .whenComplete((isMember, ex) -> MinecraftClient.getInstance().execute(() -> {
+                    .whenComplete((isMember, ex) -> mc.execute(() -> {
                         if (ex != null || !Boolean.TRUE.equals(isMember)) {
                             ctx.getSource().sendError(
                                     SeqClient.prefix(Text.translatable("sequoia.command.notASequoiaGuildMember")));

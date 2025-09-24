@@ -15,6 +15,8 @@ import star.sequoia2.client.types.command.Command;
 import star.sequoia2.features.impl.ws.WebSocketFeature;
 import star.sequoia2.utils.wynn.WynnUtils;
 
+import static star.sequoia2.client.SeqClient.mc;
+
 public class ConnectCommand extends Command implements FeaturesAccessor {
     @Override
     public String getCommandName() {
@@ -97,7 +99,7 @@ public class ConnectCommand extends Command implements FeaturesAccessor {
         }
 
         WynnUtils.isSequoiaGuildMember()
-                .whenComplete((isMember, ex) -> MinecraftClient.getInstance().execute(() -> {
+                .whenComplete((isMember, ex) -> mc.execute(() -> {
                     if (ex != null || !Boolean.TRUE.equals(isMember)) {
                         ctx.getSource().sendError(
                                 SeqClient.prefix(Text.translatable("sequoia.command.notASequoiaGuildMember")));

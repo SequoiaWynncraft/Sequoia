@@ -12,6 +12,8 @@ import star.sequoia2.features.ToggleFeature;
 
 import java.util.regex.Pattern;
 
+import static star.sequoia2.client.SeqClient.mc;
+
 public class ChatHookFeature extends ToggleFeature implements GuildParserAccessor, TeXParserAccessor {
 
     public ChatHookFeature() {
@@ -85,9 +87,9 @@ public class ChatHookFeature extends ToggleFeature implements GuildParserAccesso
         if (AUTO_CONNECT.matcher(tex).find()) {
             SeqClient.debug("parsing as login...");
             if (features().getIfActive(WebSocketFeature.class).map(webSocketFeature -> webSocketFeature.getConnectOnJoin().get()).orElse(false)
-                    && !features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isAuthenticated).orElse(false)) {
-                assert MinecraftClient.getInstance().player != null;
-                MinecraftClient.getInstance().player.networkHandler.sendCommand("connect");
+                    && !features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isAuthenticated).orElse(false)
+                    && mc.player != null) {
+                mc.player.networkHandler.sendCommand("connect");
             }
             return;
         }
@@ -112,7 +114,6 @@ public class ChatHookFeature extends ToggleFeature implements GuildParserAccesso
         if (GUILD_RAID_BLOCK.matcher(tex).find() || OTHER_GUILD_RAID_BLOCK.matcher(tex).find()) {
             SeqClient.debug("parsing as guild raid completion...");
             guildRaidParser().parseGuildRaid(tex);
-            return;
         }
     }
 

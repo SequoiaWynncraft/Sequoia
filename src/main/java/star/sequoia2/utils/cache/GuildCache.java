@@ -3,7 +3,6 @@ package star.sequoia2.utils.cache;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import star.sequoia2.client.SeqClient;
 
@@ -20,9 +19,10 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil.GSON;
+import static star.sequoia2.client.SeqClient.mc;
 
 public final class GuildCache  {
-    private static final Path FILE = MinecraftClient.getInstance().runDirectory
+    private static final Path FILE = mc.runDirectory
             .toPath().resolve("sequoia/cache/guilds.json");
     private static final Duration MAX_AGE = Duration.ofHours(1);
 

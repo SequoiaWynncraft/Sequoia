@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static star.sequoia2.client.SeqClient.mc;
 import static star.sequoia2.utils.AccessTokenManager.invalidateAccessToken;
 
 public class DisconnectCommand extends Command implements FeaturesAccessor {
@@ -72,7 +73,7 @@ public class DisconnectCommand extends Command implements FeaturesAccessor {
         }
 
         WynnUtils.isSequoiaGuildMember()
-                .whenComplete((isMember, ex) -> MinecraftClient.getInstance().execute(() -> {
+                .whenComplete((isMember, ex) -> mc.execute(() -> {
                     if (ex != null || !Boolean.TRUE.equals(isMember)) {
                         ctx.getSource().sendError(
                                 SeqClient.prefix(Text.translatable("sequoia.command.notASequoiaGuildMember")));

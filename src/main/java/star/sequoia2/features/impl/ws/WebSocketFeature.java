@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static star.sequoia2.client.SeqClient.SCHEDULER;
+import static star.sequoia2.client.SeqClient.mc;
 import static star.sequoia2.client.types.ws.WSConstants.GSON;
 
 
@@ -51,7 +52,7 @@ public class WebSocketFeature extends ToggleFeature {
     }
 
     public void initClient() {
-        java.util.UUID uuid = MinecraftClient.getInstance().getSession().getUuidOrNull();
+        java.util.UUID uuid = mc.getSession().getUuidOrNull();
         if (uuid == null) {
             SeqClient.warn("Player UUID is not available. WebSocket connection will not be established.");
             return;
@@ -307,7 +308,7 @@ public class WebSocketFeature extends ToggleFeature {
         if (!Models.WorldState.onWorld() || !Models.WorldState.onHousing()) return;
 
         /* schedule a check 10 s (20 * 10 ticks) from now */
-        SCHEDULER.schedule(() -> MinecraftClient.getInstance().execute(() -> {
+        SCHEDULER.schedule(() -> mc.execute(() -> {
             if (!isActive()) return;                // feature was disabled meanwhile
 
             if (client == null) initClient();        // create it lazily

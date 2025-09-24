@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static star.sequoia2.client.SeqClient.mc;
 import static star.sequoia2.utils.text.TextUtils.padInvisible;
 
 public class CompareCommand extends Command implements FeaturesAccessor {
@@ -124,7 +125,7 @@ public class CompareCommand extends Command implements FeaturesAccessor {
 
         /* ---- pixel widths ------------------------------------------------ */
 
-        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        TextRenderer tr = mc.textRenderer;
 
         int labelPx = Stream.of(lLevel, lSR, lOnline, lTotal)
                 .mapToInt(tr::getWidth).max().orElse(0) + tr.getWidth(" ");

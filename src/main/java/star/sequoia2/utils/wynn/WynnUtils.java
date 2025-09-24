@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.wynntils.models.character.CharacterModel.GUILD_MENU_SLOT;
+import static star.sequoia2.client.SeqClient.mc;
 
 public final class WynnUtils {
     private static final Pattern WYNNCRAFT_SERVER_PATTERN =
@@ -47,14 +48,13 @@ public final class WynnUtils {
 
     public static String getWorldFromTablist() {
 
-        MinecraftClient client = MinecraftClient.getInstance();
 
         // Single-player title screen or not yet connected
-        if (client.getNetworkHandler() == null) {
+        if (mc.getNetworkHandler() == null) {
             return "";
         }
 
-        return client.getNetworkHandler()
+        return mc.getNetworkHandler()
                 .getPlayerList()                 // List<PlayerListEntry>
                 .stream()
                 .filter(entry ->
@@ -88,16 +88,14 @@ public final class WynnUtils {
     }
 
     public static List<String> getTabList() {
-        var client = McUtils.mc();           // = MinecraftClient.getInstance()
-
         // 1. Not connected yet?  ->  empty list
-        if (client.getNetworkHandler() == null) {
+        if (mc.getNetworkHandler() == null) {
             return Collections.emptyList();
         }
 
-        PlayerListHud tabHud = client.inGameHud.getPlayerListHud();
+        PlayerListHud tabHud = mc.inGameHud.getPlayerListHud();
 
-        return client.getNetworkHandler()
+        return mc.getNetworkHandler()
                 .getListedPlayerListEntries()             // Collection<PlayerListEntry>
                 .stream()
 //                .sorted(PlayerListHud.ENTRY_ORDERING)     // vanilla comparator TODO access widener this bitch
