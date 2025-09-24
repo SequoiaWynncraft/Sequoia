@@ -9,12 +9,12 @@ import star.sequoia2.settings.types.KeybindSetting;
 
 import static star.sequoia2.client.SeqClient.mc;
 
-public class BetterGuildMap extends Feature {
+public class RTSWar extends Feature {
 
     public final KeybindSetting menuKeybind = settings().binding("GuiKey:", "Opens the Custom gui", Binding.none());
 
-    public BetterGuildMap() {
-        super("BetterGuildMap", "Replaces wynntils guild map for an improved RTS one");
+    public RTSWar() {
+        super("RTSWar", "Replaces wynntils guild map for an improved RTS one");
     }
 
     @Subscribe

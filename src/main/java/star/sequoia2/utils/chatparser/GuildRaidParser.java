@@ -8,10 +8,10 @@ import star.sequoia2.client.types.ws.message.ws.GGuildRaidWSMessage;
 import star.sequoia2.client.types.ws.message.ws.guildraid.GuildRaid;
 import star.sequoia2.client.types.ws.message.ws.guildraid.RaidType;
 import star.sequoia2.events.RaidCompleteFromChatEvent;
-import star.sequoia2.features.impl.ws.ChatHookFeature;
 import star.sequoia2.features.impl.ws.WebSocketFeature;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -50,23 +50,33 @@ public class GuildRaidParser implements FeaturesAccessor, EventBusAccessor {
 
             // hovers (if needed)
             Matcher mh = HOVER.matcher(header);
-            while (mh.find() && players.size() < 4) {
+            LinkedHashSet<String> uniq = new LinkedHashSet<>(4);
+            while (mh.find()) {
                 String hoverText = mh.group(1);
                 String visible   = mh.group(2);
                 String user = extractRealUser(hoverText);
-                    players.add(user != null ? user : cleanName(visible));
+                String candidate = cleanName(user != null ? user : visible);
+                if (candidate.isEmpty()) continue;
+                if (!isSequoiaMember(candidate)) {
+                    SeqClient.debug(candidate + " is not a Sequoia member!");
+                    return;
+                }
+                uniq.add(candidate);
+                if (uniq.size() == 4) break;
             }
             // remove hovers and parse remaining plain names (comma-separated, last "and")
             String headerNoHover = mh.replaceAll(""); // removes all hover blocks from header
             for (String tok : splitNames(headerNoHover)) {
-                if (players.size() == 4) break;
+                if (uniq.size() == 4) break;
                 String name = cleanName(tok);
+                if (name.isEmpty()) continue;
                 if (!isSequoiaMember(name)) {
                     SeqClient.debug(name + " is not a Sequoia member!");
                     return;
                 }
-                if (!name.isEmpty()) players.add(name);
+                uniq.add(name);
             }
+            players.addAll(uniq);
             if (players.size() != 4) return; // need exactly 4
 
             // parse from rest of block
@@ -163,4 +173,3 @@ public class GuildRaidParser implements FeaturesAccessor, EventBusAccessor {
     }
 
 }
-

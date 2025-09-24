@@ -1,14 +1,12 @@
 package star.sequoia2.client.notifications;
 
-import star.sequoia2.accessors.FeaturesAccessor;
-import star.sequoia2.client.SeqClient;
-import star.sequoia2.client.types.IChatHud;
-import star.sequoia2.features.impl.Settings;
-import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import star.sequoia2.accessors.FeaturesAccessor;
+import star.sequoia2.client.SeqClient;
+import star.sequoia2.features.impl.Settings;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -49,10 +47,7 @@ public class Notifications implements FeaturesAccessor {
         } else {
             prefix.append(message);
         }
-        var signature = prefix.toString() != null ? new MessageSignatureData(createSignature(Text.literal("[Seq] ").withColor(color).toString() + sig)) : null;
 
-//        ((IChatHud) mc.inGameHud.getChatHud()).seq$remove(signature);
-//        ((IChatHud) mc.inGameHud.getChatHud()).seq$invokeAddMessage(prefix, signature, MessageIndicator.system());
         SeqClient.info(message.toString());
     }
 

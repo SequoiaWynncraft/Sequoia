@@ -64,8 +64,7 @@ public class WebSocketFeature extends ToggleFeature {
 //                URI.create(Sequoia2.isDevelopmentEnvironment()
 //                                ? WS_DEV_URL
 //                                : WS_PROD_URL),
-                URI.create(WS_PROD_URL),
-//                URI.create(WS_DEV_URL),
+                SeqClient.debugMode ? URI.create(WS_DEV_URL) : URI.create(WS_PROD_URL),
                 Map.of(
                         "Authoworization",
                         "Bearer meowmeowAG6v92hc23LK5rqrSD279",
@@ -252,6 +251,7 @@ public class WebSocketFeature extends ToggleFeature {
     }
 
     public boolean isAuthenticated() {
+        if (SeqClient.debugMode) return true;
         if (!isActive()) {
             return false;
         }

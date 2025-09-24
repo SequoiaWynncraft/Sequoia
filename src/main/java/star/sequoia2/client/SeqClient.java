@@ -4,7 +4,6 @@ import com.collarmc.pounce.EventBus;
 import com.collarmc.pounce.Preference;
 import com.collarmc.pounce.Subscribe;
 import com.mojang.logging.LogUtils;
-import com.wynntils.utils.mc.McUtils;
 import lombok.Getter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -58,7 +57,8 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
 
     public static boolean initialized = false;
 
-    public static boolean debugMode = true;
+    //enable and compile for testers
+    public static boolean debugMode = false;
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -169,11 +169,12 @@ public class SeqClient implements ClientModInitializer, EventBusAccessor {
         features.add(new DiscordChatBridgeFeature());
         features.add(new WebSocketFeature());
         features.add(new EcoMessageFilter());
-        features.add(new GuildRewardTrackingFeature());
-        features.add(new BetterGuildMap());
+//        features.add(new GuildRewardTrackingFeature());
+//        features.add(new RTSWar());
         if (Seq.isHasMCEF()) {
             //features.add(new CustomChat());
         }
+        //TODO: finish commented out features.
     }
 
     public static final ScheduledExecutorService SCHEDULER =

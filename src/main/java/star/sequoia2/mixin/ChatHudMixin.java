@@ -1,18 +1,13 @@
 package star.sequoia2.mixin;
 
 import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import star.sequoia2.accessors.EventBusAccessor;
-import star.sequoia2.client.types.IChatHud;
 import star.sequoia2.events.ChatMessageEvent;
 
 import java.util.Collections;
@@ -20,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Mixin(ChatHud.class)
-public abstract class ChatHudMixin implements IChatHud, EventBusAccessor {
+public abstract class ChatHudMixin implements EventBusAccessor {
 
     @Unique
     private static final int   CACHE_SIZE     = 256;    // cap memory
@@ -40,10 +35,6 @@ public abstract class ChatHudMixin implements IChatHud, EventBusAccessor {
     private void onChatMessageEnd(Text message, CallbackInfo ci) {
         dispatch(new ChatMessageEvent(message));
     }
-
-    @Override
-    @Invoker("addMessage")
-    public abstract void seq$invokeAddMessage(Text text, @Nullable MessageSignatureData sig, @Nullable MessageIndicator indicator);
 
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;)V", at = @At("HEAD"), cancellable = true)
     private void sequoia$dedupeHead(Text message, CallbackInfo ci) {
