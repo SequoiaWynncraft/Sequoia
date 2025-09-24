@@ -251,7 +251,6 @@ public class WebSocketFeature extends ToggleFeature {
     }
 
     public boolean isAuthenticated() {
-        if (SeqClient.debugMode) return true;
         if (!isActive()) {
             return false;
         }
