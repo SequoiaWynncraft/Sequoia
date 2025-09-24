@@ -1,5 +1,7 @@
 package star.sequoia2.client.services.wynn.player;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -8,6 +10,8 @@ import star.sequoia2.accessors.TeXParserAccessor;
 import java.util.List;
 import java.util.Map;
 
+@Setter
+@Getter
 public class PlayerResponse implements TeXParserAccessor {
     private String username;
     private boolean online;
@@ -103,7 +107,7 @@ public class PlayerResponse implements TeXParserAccessor {
 
     public class GlobalData {
         private int wars;
-        private int totalLevels;
+        private int totalLevel;
         private int killedMobs;
         private int chestsFound;
         private Dungeons dungeons;
@@ -120,11 +124,11 @@ public class PlayerResponse implements TeXParserAccessor {
         }
 
         public int getTotalLevels() {
-            return totalLevels;
+            return totalLevel;
         }
 
         public void setTotalLevels(int totalLevels) {
-            this.totalLevels = totalLevels;
+            this.totalLevel = totalLevels;
         }
 
         public int getKilledMobs() {
@@ -600,182 +604,6 @@ public class PlayerResponse implements TeXParserAccessor {
         public void setQuests(List<String> quests) {
             this.quests = quests;
         }
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
-
-    public String getServer() {
-        return server;
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public String getActiveCharacter() {
-        return activeCharacter;
-    }
-
-    public void setActiveCharacter(String activeCharacter) {
-        this.activeCharacter = activeCharacter;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getRank() {
-        return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
-    }
-
-    public String getRankBadge() {
-        return rankBadge;
-    }
-
-    public void setRankBadge(String rankBadge) {
-        this.rankBadge = rankBadge;
-    }
-
-    public LegacyRankColour getLegacyRankColour() {
-        return legacyRankColour;
-    }
-
-    public void setLegacyRankColour(LegacyRankColour legacyRankColour) {
-        this.legacyRankColour = legacyRankColour;
-    }
-
-    public String getShortenedRank() {
-        return shortenedRank;
-    }
-
-    public void setShortenedRank(String shortenedRank) {
-        this.shortenedRank = shortenedRank;
-    }
-
-    public String getSupportRank() {
-        return supportRank;
-    }
-
-    public void setSupportRank(String supportRank) {
-        this.supportRank = supportRank;
-    }
-
-    public boolean isVeteran() {
-        return veteran;
-    }
-
-    public void setVeteran(boolean veteran) {
-        this.veteran = veteran;
-    }
-
-    public String getFirstJoin() {
-        return firstJoin;
-    }
-
-    public void setFirstJoin(String firstJoin) {
-        this.firstJoin = firstJoin;
-    }
-
-    public String getLastJoin() {
-        return lastJoin;
-    }
-
-    public void setLastJoin(String lastJoin) {
-        this.lastJoin = lastJoin;
-    }
-
-    public float getPlaytime() {
-        return playtime;
-    }
-
-    public void setPlaytime(float playtime) {
-        this.playtime = playtime;
-    }
-
-    public Guild getGuild() {
-        return guild;
-    }
-
-    public void setGuild(Guild guild) {
-        this.guild = guild;
-    }
-
-    public GlobalData getGlobalData() {
-        return globalData;
-    }
-
-    public void setGlobalData(GlobalData globalData) {
-        this.globalData = globalData;
-    }
-
-    public Integer getForumLink() {
-        return forumLink;
-    }
-
-    public void setForumLink(Integer forumLink) {
-        this.forumLink = forumLink;
-    }
-
-    public Map<String, Integer> getRanking() {
-        return ranking;
-    }
-
-    public void setRanking(Map<String, Integer> ranking) {
-        this.ranking = ranking;
-    }
-
-    public Map<String, Integer> getPreviousRanking() {
-        return previousRanking;
-    }
-
-    public void setPreviousRanking(Map<String, Integer> previousRanking) {
-        this.previousRanking = previousRanking;
-    }
-
-    public boolean isPublicProfile() {
-        return publicProfile;
-    }
-
-    public void setPublicProfile(boolean publicProfile) {
-        this.publicProfile = publicProfile;
-    }
-
-    public Map<String, Character> getCharacters() {
-        return characters;
-    }
-
-    public void setCharacters(Map<String, Character> characters) {
-        this.characters = characters;
     }
 
     public MutableText rankingPrettyMessage(Map<String, Integer> ranking, Integer results) {
