@@ -305,7 +305,7 @@ public class WebSocketFeature extends ToggleFeature {
             return;
         }
 
-        if (!Models.WorldState.onWorld() || !Models.WorldState.onHousing()) return;
+        if (!Models.WorldState.onWorld() && !Models.WorldState.onHousing()) return;
 
         /* schedule a check 10 s (20 * 10 ticks) from now */
         SCHEDULER.schedule(() -> mc.execute(() -> {
