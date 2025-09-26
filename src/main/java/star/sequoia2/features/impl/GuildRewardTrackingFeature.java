@@ -17,6 +17,7 @@ import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.client.SeqClient;
 import star.sequoia2.client.types.ws.message.ws.GTreasuryEmeraldAlertWSMessage;
@@ -96,13 +97,13 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
                     int aspectValue = (aspects.first * 100 / aspects.second);
                     int tomeValue = (tomes.first * 100 / tomes.second);
                     if (emeraldValue >= emeraldNotifyValue.get()) {
-                        SeqClient.info("Emeralds are above value of : " + emeraldNotifyValue.get() + "%"); //Emeralds cant take it anymorph
+                        McUtils.sendMessageToClient(SeqClient.prefix(Text.of("Emeralds are above value of : " + emeraldNotifyValue.get() + "%")));
                     }
                     if (aspectValue >= aspectNotifyValue.get()) {
-                        SeqClient.info("Aspects are above value of : " + aspectNotifyValue.get() + "%");
+                        McUtils.sendMessageToClient(SeqClient.prefix(Text.of("Aspects are above value of : " + aspectNotifyValue.get() + "%")));
                     }
                     if (tomeValue >= tomeNotifyValue.get()) {
-                        SeqClient.info("Tomes are above value of : " + tomeNotifyValue.get() + "%");
+                        McUtils.sendMessageToClient(SeqClient.prefix(Text.of("Tomes are above value of : " + tomeNotifyValue.get() + "%")));
                     }
 
                     if(emeraldValue>= 90 && sendPing.get()){
