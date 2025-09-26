@@ -11,14 +11,19 @@ import com.wynntils.handlers.container.scriptedquery.ScriptedContainerQuery;
 import com.wynntils.handlers.container.type.ContainerContent;
 import com.wynntils.models.containers.ContainerModel;
 import com.wynntils.utils.mc.LoreUtils;
+import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.wynn.InventoryUtils;
 import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import org.apache.commons.lang3.StringUtils;
 import star.sequoia2.client.SeqClient;
+import star.sequoia2.client.types.ws.message.ws.GTreasuryEmeraldAlertWSMessage;
+import star.sequoia2.events.PacketEvent;
 import star.sequoia2.events.RaidCompleteFromChatEvent;
 import star.sequoia2.features.ToggleFeature;
+import star.sequoia2.features.impl.ws.WebSocketFeature;
 import star.sequoia2.settings.types.BooleanSetting;
 import star.sequoia2.settings.types.IntSetting;
 import star.sequoia2.utils.wynn.WynnUtils;
@@ -47,29 +52,32 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
     IntSetting tomeNotifyValue = settings().number("Tomes", "Tomes Notify Value", 100,0,100);
 
     @Getter
-    BooleanSetting sendPing = settings().bool("SendPing", "Not working rn", false);
+    BooleanSetting sendPing = settings().bool("SendPing", "Enable to send Keepers ping when emeralds are above 90%", false);
 
-/*    public void startListener(){ todo: will fix this ltr with regex and new system
-        if (isEnabled() && !isRunning){
-            isRunning = true;
-        GameMessageS2CEvents.TEXT.register(message -> {
-            if (message.toString().contains("\uDAFF\uDFFC\uE001\uDB00\uDC06")){
-                 Sequoia2.debug("found first");
+
+    @Subscribe
+    private void cancelPing(PacketEvent.PacketReceiveEvent event){
+        if (!features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) return;
+        if (event.packet() instanceof GameMessageS2CPacket packet){
+            if (!packet.overlay()){ //todo: ask flare or op to make this regex :like:
+                if (packet.content().toString().contains("\uDAFF\uDFFC\uE001\uDB00\uDC06") && packet.content().toString().contains("to")
+                        && packet.content().toString().contains("rewarded") && packet.content().toString().contains("Emeralds")) {
+                    GTreasuryEmeraldAlertWSMessage payload = new GTreasuryEmeraldAlertWSMessage(
+                            new GTreasuryEmeraldAlertWSMessage.Data(
+                                    false,
+                                    McUtils.playerName()
+                            )
+                    );
+                    features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.sendMessage(payload));
+                }
             }
-            if (message.toString().contains("to")){
-                Sequoia2.debug("found second");
-            }
-            if (message.toString().contains("rewarded")){
-                Sequoia2.debug("found third");
-            }
-            if (message.toString().contains("\uDAFF\uDFFC\uE001\uDB00\uDC06") && message.toString().contains("to") && message.toString().contains("rewarded")) {
-                //&b󏿼󐀆 &3GAZtheMiner rewarded &e1024 Emeralds&3 to cinfrascitizen
-                //&b󏿼󏿿󏿾 &3Shisouhan rewarded &ean Aspect&3 to LegendaryVirus
-                rewardsDone = true;
-            }
-        });
         }
-    }*/
+    }
+    //                &b󏿼󐀆 &3GAZtheMiner rewarded &e1024 Emeralds&3 to cinfrascitizen
+    //                &b󏿼󏿿󏿾 &3Shisouhan rewarded &ean Aspect&3 to LegendaryVirus
+    //                &b󏿼󐀆 &3Obstacles_ rewarded &ean Aspect&3 to Obstacles_
+    //                &b󏿼󐀆 &3Obstacles_ rewarded &e1024 Emeralds&3 to Obstacles_
+
     @Subscribe
     public void onRaidComp(RaidCompleteFromChatEvent event){
         processGuildRewards();
@@ -88,7 +96,7 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
                     int aspectValue = (aspects.first * 100 / aspects.second);
                     int tomeValue = (tomes.first * 100 / tomes.second);
                     if (emeraldValue >= emeraldNotifyValue.get()) {
-                        SeqClient.info("Emeralds are above value of : " + emeraldNotifyValue.get() + "%");
+                        SeqClient.info("Emeralds are above value of : " + emeraldNotifyValue.get() + "%"); //Emeralds cant take it anymorph
                     }
                     if (aspectValue >= aspectNotifyValue.get()) {
                         SeqClient.info("Aspects are above value of : " + aspectNotifyValue.get() + "%");
@@ -96,36 +104,18 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
                     if (tomeValue >= tomeNotifyValue.get()) {
                         SeqClient.info("Tomes are above value of : " + tomeNotifyValue.get() + "%");
                     }
-/*                   Managers.TickScheduler.scheduleLater( todo: ignore
-                           () -> {
-                               // honestly dk if sequoiamember check is necessary but yeah it shere
-                               WynnUtils.isSequoiaGuildMember().whenComplete((isSequoiaGuildMember, throwable) -> {
-                                   if (throwable != null) {
-                                       Sequoia2.error("Failed to check if player is a Sequoia guild member");
-                                       return;
-                                   }
-                                   if (!isSequoiaGuildMember) {
-                                       return;
-                                   }
-                                   if (!rewardsDone && emeraldValue >= Sequoia2.CONFIG.guildRewardTrackingFeature.EmeraldNotifyValue()) {
-                                       GChatMessageWSMessage payload = new GChatMessageWSMessage(
-                                       new GChatMessageWSMessage.Data(
-                                               "xdprogamer",
-                                               "xdprogamer_testing",
-                                               "@xdprogamer",
-                                               TimeUtils.wsTimestamp(),
-                                               McUtils.playerName()
 
-                                       ));
-                                       Sequoia2.getWebSocketFeature().sendMessage(payload);
-                                   }
-                                   rewardsDone = false;
-                                   Sequoia2.debug("set rewardsdone to false");
+                    if(emeraldValue>= 90 && sendPing.get()){
+                        if (!features().getIfActive(WebSocketFeature.class).map(WebSocketFeature::isActive).orElse(false)) return;
+                        GTreasuryEmeraldAlertWSMessage payload = new GTreasuryEmeraldAlertWSMessage(
+                                new GTreasuryEmeraldAlertWSMessage.Data(
+                                        true,
+                                        McUtils.playerName()
+                                )
+                        );
+                        features().getIfActive(WebSocketFeature.class).ifPresent(webSocketFeature -> webSocketFeature.sendMessage(payload));
+                    }
 
-                               });
-
-                           },
-                           20 * 40);*/
                 }
         );
 
@@ -205,6 +195,3 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
         TOME
     }
 }
-
-//&b󏿼󐀆 &3Obstacles_ rewarded &ean Aspect&3 to Obstacles_
-    //&b󏿼󐀆 &3Obstacles_ rewarded &e1024 Emeralds&3 to Obstacles_

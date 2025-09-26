@@ -31,13 +31,35 @@ public enum WSMessageType {
     S_RESERVED_7,
     S_REWARD_DATA,
     S_RESERVED_9,
-    S_RESERVED_10,
+    S_DEBUG_MESSAGE,
 
     D_CHANNEL_MESSAGE,
     D_GET_CONNECTED_CLIENT,
     D_SERVER_RESTART,
-    D_SERVER_MESSAGE;
+    D_SERVER_MESSAGE,
 
+    G_ATTACK_ATTEMPTED,
+
+    S_PARTY_INVITE,
+    S_PARTY_MEMBER_LIST_REQUEST,
+
+    G_PARTY_MEMBER_LIST,
+    G_PARTY_INVITED,
+    G_PARTY_CHANGE,
+
+    G_MESSAGE_REFERENCE,
+    S_MESSAGE_REFERENCE,
+
+    S_SERVER_EMOJI_LIST,
+    S_HTML_DATA,
+
+    G_WAR_CMD,
+    S_WAR_CMD,
+    G_TERRITORY_DATA,
+
+    S_REPLY,
+
+    G_TREASURY_EMERALD_ALERT;
     public static WSMessageType fromValue(int value) {
         for (WSMessageType type : values()) {
             if (type.getValue() == value) {
