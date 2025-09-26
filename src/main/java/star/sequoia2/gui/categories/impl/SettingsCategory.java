@@ -55,6 +55,8 @@ public class SettingsCategory extends RelativeComponent implements RenderUtilAcc
             components.add(new SliderComponent<>(floatSetting));
         } else if (setting instanceof IntSetting intSetting) {
             components.add(new SliderComponent<>(intSetting));
+        } else if (setting instanceof TextSetting textSetting) {
+            components.add(new TextInputSettingComponent(textSetting));
         }
     }
 

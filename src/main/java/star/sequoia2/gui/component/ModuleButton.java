@@ -64,6 +64,8 @@ public class ModuleButton extends RelativeComponent implements SettingsAccessor,
             components.add(new SliderComponent<>(doubleSetting));
         } else if(setting instanceof IntSetting doubleSetting) {
             components.add(new SliderComponent<>(doubleSetting));
+        } else if(setting instanceof TextSetting textSetting) {
+            components.add(new TextInputSettingComponent(textSetting));
         }
     }
 

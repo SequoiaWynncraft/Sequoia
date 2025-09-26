@@ -19,6 +19,8 @@ import static star.sequoia2.client.SeqClient.mc;
 @Getter
 public class Settings extends Feature {
 
+    public TextSetting settingtest = settings().text("text:", "text test", "hi");
+
     public final KeybindSetting menuKeybind = settings().binding("GuiKey:", "Opens the ClickGui", Binding.withKey(GLFW.GLFW_KEY_O));
 
     public EnumSetting<Themes.ThemeEnum> theme = settings().options("ChatTheme", "ChatTheme Setting", Themes.ThemeEnum.NEXUS, Themes.ThemeEnum.class);
