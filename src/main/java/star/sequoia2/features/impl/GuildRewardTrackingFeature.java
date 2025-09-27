@@ -90,6 +90,8 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
         SeqClient.debug("Starting to parse guild rewards");
 
         checkGuildRewards().thenAcceptAsync(rewardStorage -> {
+                    if (rewardStorage == null){return;}
+                    if (rewardStorage.isEmpty()){return;}
                     Pair<Integer, Integer> emeralds = rewardStorage.getOrDefault(GuildRewardType.EMERALD, Pair.of(-1, -1));
                     Pair<Integer, Integer> aspects = rewardStorage.getOrDefault(GuildRewardType.ASPECT, Pair.of(-1, -1));
                     Pair<Integer, Integer> tomes = rewardStorage.getOrDefault(GuildRewardType.TOME, Pair.of(-1, -1));
@@ -167,6 +169,7 @@ public class GuildRewardTrackingFeature extends ToggleFeature {
 
         for (StyledText loreLine : LoreUtils.getLore(guildRewardsItem)) {
             SeqClient.debug("Item: " + loreLine);
+            if (loreLine.contains("Rewards are unavailable")){break;}
             Matcher emeraldsMatcher = GUILD_REWARDS_EMERALDS_PATTERN.matcher(loreLine.getString());
             Matcher tomesMatcher = GUILD_REWARDS_TOMES_PATTERN.matcher(loreLine.getString());
             Matcher aspectsMatcher = GUILD_REWARDS_ASPECTS_PATTERN.matcher(loreLine.getString());
