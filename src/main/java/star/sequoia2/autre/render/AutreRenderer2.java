@@ -549,16 +549,16 @@ public class AutreRenderer2 {
     public static void fillCircle(MatrixStack matrices, float centerX, float centerY, float radius, Color color, int segments) {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        
+
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        
+
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-        
+
         // Center vertex
         buffer.vertex(matrix, centerX, centerY, 0f).color(color.r, color.g, color.b, color.a);
-        
+
         // Circle vertices
         for (int i = 0; i <= segments; i++) {
             float angle = (float)(i * 2.0 * Math.PI / segments);
@@ -566,7 +566,7 @@ public class AutreRenderer2 {
             float y = centerY + radius * (float)Math.sin(angle);
             buffer.vertex(matrix, x, y, 0f).color(color.r, color.g, color.b, color.a);
         }
-        
+
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
@@ -580,32 +580,32 @@ public class AutreRenderer2 {
     public static void strokeCircle(MatrixStack matrices, float centerX, float centerY, float radius, float strokeWidth, Color color, int segments) {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        
+
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        
+
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-        
+
         float innerRadius = radius - strokeWidth / 2f;
         float outerRadius = radius + strokeWidth / 2f;
-        
+
         for (int i = 0; i <= segments; i++) {
             float angle = (float)(i * 2.0 * Math.PI / segments);
             float cos = (float)Math.cos(angle);
             float sin = (float)Math.sin(angle);
-            
+
             // Inner vertex
             float innerX = centerX + innerRadius * cos;
             float innerY = centerY + innerRadius * sin;
             buffer.vertex(matrix, innerX, innerY, 0f).color(color.r, color.g, color.b, color.a);
-            
+
             // Outer vertex
             float outerX = centerX + outerRadius * cos;
             float outerY = centerY + outerRadius * sin;
             buffer.vertex(matrix, outerX, outerY, 0f).color(color.r, color.g, color.b, color.a);
         }
-        
+
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
