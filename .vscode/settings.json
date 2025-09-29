@@ -1,0 +1,14 @@
+{
+    "java.import.gradle.enabled": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "files.exclude": {
+        "Sequoia1 (old mod codebase)/**": true
+    },
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.import.gradle.java.home": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "java.debug.settings.maxStringLength": 0,
+    "java.debug.settings.numericPrecision": 0,
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.debug.settings.enableRunDebugCodeLens": false,
+    "java.debug.logLevel": "warn"
+}
