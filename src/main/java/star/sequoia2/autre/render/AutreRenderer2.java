@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
+import star.sequoia2.accessors.TextRendererAccessor;
 import star.sequoia2.autre.render.text.AutreTextRenderer;
 
 import java.util.*;
@@ -19,7 +20,9 @@ import static star.sequoia2.client.SeqClient.mc;
  * AutreRenderer22 - Advanced GPU-accelerated renderer with transparency, blur, animations, and partial redraw
  * Designed for high-performance modern UI rendering with minimal GPU overhead
  */
-public class AutreRenderer2 {
+public class AutreRenderer2 implements TextRendererAccessor {
+
+    private static final Deque<int[]> SCISSOR_STACK = new ArrayDeque<>();
 
     // Core color system with advanced features
     public static class Color {
@@ -819,23 +822,24 @@ public class AutreRenderer2 {
         drawText(layerId, text, x, y, color, null, false, null);
     }
 
-    public static void drawText(String layerId, String text, float x, float y, Color color, 
+    public static void drawText(String layerId, String text, float x, float y, Color color,
                                String font, boolean shadow, Animation animation) {
         RenderLayer layer = getLayer(layerId);
-        
+
         Color renderColor = color;
         if (animation != null && animation.isActive()) {
             renderColor = color.withAlpha(color.a * animation.getProgress());
         }
-        
+
         TextCommand command = new TextCommand(text, x, y, renderColor, font, shadow);
         layer.addCommand(command);
     }
-    
+
     /**
      * Direct text rendering - for immediate rendering with DrawContext
      */
     public static void drawText(DrawContext context, String text, float x, float y, Color color, boolean shadow) {
+        reapplyTopScissor();
         int intColor = color.getRGBA();
         if (shadow) {
             context.drawText(mc.textRenderer, text, (int)(x + 1), (int)(y + 1), 0xFF000000, false);
@@ -847,6 +851,7 @@ public class AutreRenderer2 {
      * Draw text with DrawContext and TextStyle for UI components
      */
     public static void drawText(DrawContext context, String text, float x, float y, AutreTextRenderer.TextStyle style) {
+        reapplyTopScissor();
         AutreTextRenderer.drawText(context, text, x, y, style);
     }
     
@@ -868,18 +873,62 @@ public class AutreRenderer2 {
     public static void clearClipBounds() {
         clipping = false;
     }
-    
+
     /**
      * Scissor test for clipping
      */
-    public static void enableScissor(int x, int y, int width, int height) {
-        // Enable OpenGL scissor test for clipping
-        com.mojang.blaze3d.systems.RenderSystem.enableScissor(x, y, width, height);
+
+    public static void reapplyTopScissor() {
+        if (!SCISSOR_STACK.isEmpty()) {
+            int[] r = SCISSOR_STACK.peek();
+            com.mojang.blaze3d.systems.RenderSystem.enableScissor(r[0], r[1], r[2], r[3]);
+        }
     }
-    
+
+    public static void pushScissorWindow(int x, int y, int w, int h) {
+        int[] r = new int[]{x, y, Math.max(0, w), Math.max(0, h)};
+        if (!SCISSOR_STACK.isEmpty()) {
+            int[] a = SCISSOR_STACK.peek();
+            int nx = Math.max(a[0], r[0]);
+            int ny = Math.max(a[1], r[1]);
+            int ex = Math.min(a[0] + a[2], r[0] + r[2]);
+            int ey = Math.min(a[1] + a[3], r[1] + r[3]);
+            int nw = Math.max(0, ex - nx);
+            int nh = Math.max(0, ey - ny);
+            r = new int[]{nx, ny, nw, nh};
+        }
+        SCISSOR_STACK.push(r);
+        com.mojang.blaze3d.systems.RenderSystem.enableScissor(r[0], r[1], r[2], r[3]);
+    }
+
+    public static void pushScissorGUI(float x, float y, float width, float height) {
+        net.minecraft.client.util.Window win = mc.getWindow();
+        double s = win.getScaleFactor();
+        int sx = (int)Math.round(x * s);
+        int sy = (int)Math.round(win.getHeight() - (y + height) * s);
+        int sw = (int)Math.round(width * s);
+        int sh = (int)Math.round(height * s);
+        pushScissorWindow(sx, sy, sw, sh);
+    }
+
+    public static void popScissor() {
+        if (SCISSOR_STACK.isEmpty()) return;
+        SCISSOR_STACK.pop();
+        if (SCISSOR_STACK.isEmpty()) {
+            com.mojang.blaze3d.systems.RenderSystem.disableScissor();
+        } else {
+            int[] r = SCISSOR_STACK.peek();
+            com.mojang.blaze3d.systems.RenderSystem.enableScissor(r[0], r[1], r[2], r[3]);
+        }
+    }
+
+    // replace the old methods with these
+    public static void enableScissor(int x, int y, int width, int height) {
+        pushScissorWindow(x, y, width, height);
+    }
+
     public static void disableScissor() {
-        // Disable OpenGL scissor test
-        com.mojang.blaze3d.systems.RenderSystem.disableScissor();
+        popScissor();
     }
 
     /**
@@ -1125,19 +1174,19 @@ public class AutreRenderer2 {
             float height = textRenderer.fontHeight;
             this.bounds = new Rectangle(x, y, width, height);
         }
-        
+
         @Override
         public void execute(DrawContext context) {
+            reapplyTopScissor();
             TextRenderer textRenderer = mc.textRenderer;
             int colorInt = color.getRGBA();
-            
             if (shadow) {
                 context.drawTextWithShadow(textRenderer, text, (int)bounds.x, (int)bounds.y, colorInt);
             } else {
                 context.drawText(textRenderer, text, (int)bounds.x, (int)bounds.y, colorInt, false);
             }
         }
-        
+
         @Override
         public Rectangle getBounds() { return bounds; }
         

@@ -64,7 +64,7 @@ public class AutreButton extends AutreComponent {
         return this;
     }
     
-            @Override
+    @Override
     protected void renderSelf(DrawContext context, float mouseX, float mouseY, float deltaTime) {
         // Check if mouse is hovering
         boolean isHovered = enabled && mouseX >= getAbsoluteX() && mouseX <= getAbsoluteX() + width &&
@@ -112,9 +112,9 @@ public class AutreButton extends AutreComponent {
             float textX = getAbsoluteX() + (width - textWidth) / 2f;
             float textY = getAbsoluteY() + (height - mc.textRenderer.fontHeight) / 2f;
             
-            context.drawText(mc.textRenderer, text,
+            AutreRenderer2.drawText(context, text,
                 (int) textX, (int) textY,
-                currentTextColor.toRGB(), false);
+                currentTextColor, false);
         }
     }
 }

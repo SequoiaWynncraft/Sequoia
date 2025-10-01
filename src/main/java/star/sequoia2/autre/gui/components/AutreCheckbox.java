@@ -163,9 +163,9 @@ public class AutreCheckbox extends AutreComponent {
             float labelX = checkboxX + checkboxSize + labelSpacing;
             float labelY = getAbsoluteY() + (height - mc.textRenderer.fontHeight) / 2f;
             
-            context.drawText(mc.textRenderer, label,
+            AutreRenderer2.drawText(context, label,
                 (int) labelX, (int) labelY,
-                currentLabelColor.toRGB(), false);
+                currentLabelColor, false);
         }
     }
     

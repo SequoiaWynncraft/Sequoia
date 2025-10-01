@@ -267,32 +267,18 @@ public class AutreTextRenderer {
     /**
      * Render a text segment
      */
-    private static void renderTextSegment(DrawContext context, String text, float x, float y, 
-                                        TextStyle style, boolean shadow) {
+    private static void renderTextSegment(DrawContext context, String text, float x, float y, TextStyle style, boolean shadow) {
+        AutreRenderer2.reapplyTopScissor();
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        
-        // Apply scaling based on font size
-        float scale = style.size / 9f; // 9 is default Minecraft font size
+        float scale = style.size / 9f;
         matrices.scale(scale, scale, 1f);
-        
         int color = style.color.getRGBA();
-        
-        // Render shadow if enabled
         if (shadow || style.shadow) {
             int shadowColor = style.shadowColor.getRGBA();
-            context.drawText(mc.textRenderer, text, 
-                (int)((x + style.shadowOffsetX) / scale), 
-                (int)((y + style.shadowOffsetY) / scale), 
-                shadowColor, false);
+            context.drawText(mc.textRenderer, text, (int)((x + style.shadowOffsetX) / scale), (int)((y + style.shadowOffsetY) / scale), shadowColor, false);
         }
-        
-        // Render main text
-        context.drawText(mc.textRenderer, text, 
-            (int)(x / scale), 
-            (int)(y / scale), 
-            color, false);
-        
+        context.drawText(mc.textRenderer, text, (int)(x / scale), (int)(y / scale), color, false);
         matrices.pop();
     }
     
@@ -300,28 +286,17 @@ public class AutreTextRenderer {
      * Render an emoji segment
      */
     private static void renderEmojiSegment(DrawContext context, String emoji, float x, float y, TextStyle style) {
-        // For now, render emoji as text using Minecraft's renderer
-        // In the future, this would integrate with tweemoji
+        AutreRenderer2.reapplyTopScissor();
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        
         float scale = style.size / 9f;
         matrices.scale(scale, scale, 1f);
-        
         int color = style.color.getRGBA();
-        
-        // Convert shortcode to unicode if needed
         String emojiText = emoji;
         if (emoji.startsWith(":") && emoji.endsWith(":")) {
-            // This would be replaced with actual shortcode to unicode conversion
             emojiText = convertShortcodeToUnicode(emoji);
         }
-        
-        context.drawText(mc.textRenderer, emojiText, 
-            (int)(x / scale), 
-            (int)(y / scale), 
-            color, false);
-        
+        context.drawText(mc.textRenderer, emojiText, (int)(x / scale), (int)(y / scale), color, false);
         matrices.pop();
     }
     

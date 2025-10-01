@@ -1,9 +1,15 @@
 package star.sequoia2.autre.gui.demo;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import star.sequoia2.autre.gui.components.*;
 import star.sequoia2.autre.gui.containers.*;
 import star.sequoia2.autre.render.AutreRenderer2;
+
+import java.awt.*;
+
+import static star.sequoia2.client.SeqClient.mc;
 
 /**
  * Comprehensive demo showcasing ALL Autre components in a scrollable grid layout
@@ -565,45 +571,41 @@ public class AutreComprehensiveDemoGUI extends AutreContainer {
         
         maxScrollOffset = Math.max(0, totalContentHeight - getHeight());
     }
-    
+
     @Override
-    protected void renderSelf(DrawContext context, float mouseX, float mouseY, float deltaTime) {
-        // Draw flat background for better visibility
-        AutreRenderer2.fillRect(context.getMatrices(), 0, 0, getWidth(), getHeight(),
-                               AutreRenderer2.Color.BACKGROUND);
-        
-        // Draw border
-        AutreRenderer2.strokeRect(context.getMatrices(), 0, 0, getWidth(), getHeight(), 2f,
-                                 AutreRenderer2.Color.ACCENT);
-        
-        // Apply scroll offset to all children
+    public void render(DrawContext context, float mouseX, float mouseY, float deltaTime) {
+        AutreRenderer2.pushScissorGUI(getAbsoluteX(), getAbsoluteY(), getWidth(), getHeight());
+
+        AutreRenderer2.fillRect(context.getMatrices(), 0, 0, getWidth(), getHeight(), AutreRenderer2.Color.BACKGROUND);
+        AutreRenderer2.strokeRect(context.getMatrices(), 0, 0, getWidth(), getHeight(), 2f, AutreRenderer2.Color.ACCENT);
+
+        float scrolledMouseY = mouseY + scrollOffset;
+
         context.getMatrices().push();
         context.getMatrices().translate(0, -scrollOffset, 0);
-        
-        // Render children with proper scroll offset handling
+
         for (AutreComponent child : getChildren()) {
             if (child.isVisible()) {
-                // Check if child is in visible area (with padding for smooth scrolling)
                 float childY = child.getY() - scrollOffset;
                 if (childY + child.getHeight() >= -50 && childY <= getHeight() + 50) {
-                    // Pass mouse coordinates adjusted for scroll
-                    child.render(context, mouseX, mouseY, deltaTime);
+                    child.render(context, mouseX, scrolledMouseY, deltaTime);
                 }
             }
         }
-        
+
         context.getMatrices().pop();
-        
-        // Draw scroll indicator if needed
+
+        AutreRenderer2.popScissor();
+
         if (maxScrollOffset > 0) {
             drawScrollIndicator(context);
         }
     }
-    
+
     private void drawScrollIndicator(DrawContext context) {
         float scrollBarWidth = 10f;
         float scrollBarHeight = getHeight() - 20f;
-        float scrollBarX = getWidth() - scrollBarWidth - 5f;
+        float scrollBarX = getWidth() + 200 - scrollBarWidth - 5f;
         float scrollBarY = 10f;
         
         // Draw scroll track with flat colors
